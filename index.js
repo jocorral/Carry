@@ -14,7 +14,40 @@ restService.use(
 
 restService.use(bodyParser.json());
 
-restService.post("/pedido", (request, response) => {
+restService.post("/echo", function (req, res) {
+    var speech =
+        req.body.queryResult &&
+            req.body.queryResult.parameters &&
+            req.body.queryResult.parameters.echoText
+            ? req.body.queryResult.parameters.echoText
+            : "Seems like some problem. Speak again.";
+
+    var speechResponse = {
+        google: {
+            expectUserResponse: true,
+            richResponse: {
+                items: [
+                    {
+                        simpleResponse: {
+                            textToSpeech: speech
+                        }
+                    }
+                ]
+            }
+        }
+    };
+
+    return res.json({
+        payload: speechResponse,
+        //data: speechResponse,
+        fulfillmentText: speech,
+        speech: speech,
+        displayText: speech,
+        source: "webhook-echo-sample"
+    });
+});
+
+/*restService.post("/pedido", (request, response) => {
     var response = request.body.queryResult &&
         request.body.queryResult.parameters &&
         request.body.queryResult.parameters.echoText
@@ -42,7 +75,7 @@ restService.post("/pedido", (request, response) => {
         displayText: speechResponse,
         source: "carry-ws"
     });
-});
+});*/
 
 
 restService.listen(process.env.PORT || 8000, function () {
