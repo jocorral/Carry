@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const bodyParser = require('body-parser');
-const http = require('http');
-const API_KEY = require('./apiKey');
+const express = require("express");
+const bodyParser = require("body-parser");
+const http = require("http");
+const API_KEY = require("./apiKey");
 
 const restService = express();
 restService.use(
@@ -14,7 +14,7 @@ restService.use(
 
 restService.use(bodyParser.json());
 
-restService.post('/post-pedido', (request, response) => {
+restService.post("/post-pedido", (request, response) => {
     var response = request.body.queryResult &&
         request.body.queryResult.parameters &&
         request.body.queryResult.parameters.echoText
@@ -37,10 +37,10 @@ restService.post('/post-pedido', (request, response) => {
     return response.json({
         payload: speechResponse,
         //data: ,
-        fulfillmentText: 'Respuesta por defecto',
+        fulfillmentText: "Respuesta por defecto",
         speech: speechResponse,
         displayText: speechResponse,
-        source: 'carry-ws'
+        source: "carry-ws"
     });
 });
 
