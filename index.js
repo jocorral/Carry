@@ -2,8 +2,8 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
-const http = require("http");
-const API_KEY = require("./apiKey");
+//const http = require("http");
+//const API_KEY = require("./apiKey");
 
 const restService = express();
 restService.use(
@@ -78,9 +78,9 @@ restService.post("/echo", function (req, res) {
 });*/
 
 
-restService.listen(process.env.PORT || 8000, function () {
+/*restService.listen(process.env.PORT || 8000, function () {
     console.log("Server up and listening");
-});
+});*/
 
 /*restService.post("/echo", function (req, res) {
     var speech =
