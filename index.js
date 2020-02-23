@@ -218,6 +218,38 @@ restService.listen(process.env.PORT || 8000, function() {
   console.log("Server up and listening");
 });
 
+/*Parte potencial del package.json
+{
+  "name": "carrywebhook",
+  "version": "1.0.0",
+  "description": "Webhook para el PFM",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jocorral/Carry.git"
+  },
+  "keywords": [
+    "assistant",
+    "voice",
+    "dialogflow"
+  ],
+  "author": "jocorral",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jocorral/Carry/issues"
+  },
+  "homepage": "https://github.com/jocorral/Carry#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.8.11",
+    "moongoose": "0.0.5"
+  }
+}*/
+
 /*restService.post("/pedido", (request, response) => {
     var response = request.body.queryResult &&
         request.body.queryResult.parameters &&
