@@ -14,7 +14,7 @@ restService.use(
 
 restService.use(bodyParser.json());
 
-restService.post("/post-pedido", (request, response) => {
+restService.post("/pedido", (request, response) => {
     var response = request.body.queryResult &&
         request.body.queryResult.parameters &&
         request.body.queryResult.parameters.echoText
