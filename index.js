@@ -13,13 +13,13 @@ restService.use(
 
 restService.use(bodyParser.json());
 
-restService.post("/echo", function(req, res) {
+restService.post("/pedir", function(req, res) {
   var speech =
     req.body.queryResult &&
     req.body.queryResult.parameters &&
-    req.body.queryResult.parameters.plato
+    req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numeroPlatos && req.body.queryResult.parameters.direccion
       ? req.body.queryResult.parameters.plato
-      : "Seems like some problem. Speak again.";
+      : "Parece que algo ha fallado, por favor, vuelve a decirme qué quieres";
   
   var speechResponse = {
     google: {
