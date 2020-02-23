@@ -30,7 +30,16 @@ restService.post('/post-pedido', (request, response) => {
             }
         }
     };
-
+    
+    return response.json({
+        payload: speechResponse,
+        //data: ,
+        fulfillmentText: 'Respuesta por defecto',
+        speech: speechResponse,
+        displayText: speechResponse,
+        source: ''
+    
+    });
 });
 
 restService.listen((process.env.PORT || 8000), () => {
