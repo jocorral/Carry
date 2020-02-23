@@ -1,0 +1,7 @@
+
+{
+    "name": "Carry",
+    "description": "Webhook para la app Carry",
+    "repository": "https://github.com/jocorral/Carry.git",
+    "keywords": ["api.ai", "dialogflow", "natural language"]
+  }
