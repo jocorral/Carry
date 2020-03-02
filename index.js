@@ -15,7 +15,7 @@ restService.use(bodyParser.json());
 
 restService.post("/webhook", function (req, res) {
 
-  if (req.body.queryResult.intent.name == 'order') {
+  if (req.body.queryResult.intent.displayName == 'order') {
     var speech;
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
@@ -54,7 +54,7 @@ restService.post("/webhook", function (req, res) {
       source: "webhook-echo-sample"
     });
   }
-  else if(req.body.queryResult.intent.name == 'pay'){
+  else if(req.body.queryResult.intent.displayName == 'pay'){
     return res.json({
       payload: speechResponse,
       //data: speechResponse,
@@ -67,7 +67,7 @@ restService.post("/webhook", function (req, res) {
     return res.json({
       payload: speechResponse,
       //data: speechResponse,
-      fulfillmentText: 'Something didn\'t go as planned, the intent name is: ' + req.body.queryResult.intent.name,
+      fulfillmentText: 'Something didn\'t go as planned, the intent name is: ' + req.body.queryResult.intent.displayName,
       speech: speech,
       displayText: speech,
       source: "webhook-echo-sample"
