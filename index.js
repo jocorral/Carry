@@ -17,7 +17,9 @@ restService.post("/order", function(req, res) {
   var speech;
   if(req.body.queryResult && req.body.queryResult.parameters){
     if(req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero){
-      speech =  req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', coming up!'
+      speech = req.body.queryResult.parameters.plato !== 1 ?
+      req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + 's, coming up!':
+      req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', coming up!' ;
     }else{
       speech = req.body.queryResult.parameters.plato ? req.body.queryResult.parameters.plato + ', coming up!' : "Something didn't go as planned, please repeat your request"
     }
