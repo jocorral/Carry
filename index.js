@@ -14,9 +14,14 @@ restService.use(
 restService.use(bodyParser.json());
 
 restService.post("/order", function(req, res) {
-  var speech =
-    req.body.queryResult &&
-    req.body.queryResult.parameters &&
+  var speech;
+  if(req.body.queryResult && req.body.queryResult.parameters){
+    if(req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero){
+      speech =  req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', coming up!'
+    }else{
+      speech = req.body.queryResult.parameters.plato ? req.body.queryResult.parameters.plato + ', coming up!' : "Something didn't go as planned, please repeat your request"
+    }
+  }
     req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero //&& req.body.queryResult.parameters.direccion
       ? req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', coming up!'
       : "Something didn't go as planned, please repeat your request";
