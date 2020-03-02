@@ -17,6 +17,9 @@ restService.post("/order", function(req, res) {
   var speech;
   if(req.body.queryResult && req.body.queryResult.parameters){
     if(req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero){
+      if(req.body.queryResult.parameters.numero.toLowerCase === 'a' || req.body.queryResult.parameters.numero.toLowerCase === 'some'){
+        req.body.queryResult.parameters.numero = 1;
+      }
       speech = req.body.queryResult.parameters.plato !== 1 ?
       req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + 's, coming up!':
       req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', coming up!' ;
