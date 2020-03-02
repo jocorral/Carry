@@ -17,9 +17,9 @@ restService.post("/pedir", function(req, res) {
   var speech =
     req.body.queryResult &&
     req.body.queryResult.parameters &&
-    req.body.queryResult.parameters.plato //&& req.body.queryResult.parameters.numeroPlatos && req.body.queryResult.parameters.direccion
-      ? req.body.queryResult.parameters.plato
-      : "Parece que algo ha fallado, por favor, vuelve a decirme qué quieres";
+    req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero //&& req.body.queryResult.parameters.direccion
+      ? req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', coming up!'
+      : "Something didn't go as planned, please repeat your request";
   
   var speechResponse = {
     google: {
