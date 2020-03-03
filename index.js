@@ -14,20 +14,23 @@ restService.use(
 restService.use(bodyParser.json());
 
 restService.post("/webhook", function (req, res) {
+  var PROJECT_ID = 'carry-lajhni';
+  var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
+
 
   if (req.body.queryResult.intent.displayName == 'order') {
     var speech;
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
         speech = req.body.queryResult.parameters.numero !== 1 ?
-          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + 's, coming up!' :
-          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', coming up!';
+          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + 's, is this what you want to order?' :
+          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', is this what you want to order?';
       } else {
-        speech = req.body.queryResult.parameters.plato ? req.body.queryResult.parameters.plato + ', coming up!' : "Something didn't go as planned, please repeat your request"
+        speech = req.body.queryResult.parameters.plato ? req.body.queryResult.parameters.plato + ', is this what you want to order?' : "Something didn't go as planned, please repeat your request"
       }
     }
     req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero //&& req.body.queryResult.parameters.direccion
-      ? req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', coming up!'
+      ? req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', is this what you want to order?'
       : "Something didn't go as planned, please repeat your request";
 
     var speechResponse = {
