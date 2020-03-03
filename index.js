@@ -16,10 +16,10 @@ restService.use(bodyParser.json());
 restService.post("/webhook", function (req, res) {
   var PROJECT_ID = 'carry-lajhni';
   var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
+  var speech;
 
 
   if (req.body.queryResult.intent.displayName == 'order') {
-    var speech;
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
         speech = req.body.queryResult.parameters.numero !== 1 ?
@@ -74,12 +74,16 @@ restService.post("/webhook", function (req, res) {
   else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
     var order = '';
     var totalCost = 0;
-    // Calculate payment
+    if (req.body.queryResult && req.body.queryResult.parameters) {
+      speech = req.body.queryResult.parameters.response == 'Yes' ? 'Alright! The total cost of your order is ' + totalCost + '€. Would you like to pay it now or pay it on your arrival?' : 'Sure, let\'s make the order again.';
+      // Calculate payment
+    }
+
 
     return res.json({
       payload: speechResponse,
       //data: speechResponse,
-      fulfillmentText: 'Alright! The total cost of your order is ' + req.body.queryResult.parameters.coste + '€. Would you like to pay it now or pay it on your arrival?',
+      fulfillmentText: speech,
       speech: speech,
       displayText: speech,
       source: "webhook-echo-sample"
@@ -90,7 +94,7 @@ restService.post("/webhook", function (req, res) {
     //This variable indicates whether the user wants to pay the order by credit card or manually
     var payByCredCard = false;
     //If payment wants to be done by hand, save order in db, elsewise, launch next intent
-    var speech = !payByCredCard ? 'You selected the payment to be manual. Please wait for an email confirmation of the transaction.' : 'Please indicate the credit card number, its date of expiry and its CVV.'
+    speech = !payByCredCard ? 'You selected the payment to be manual. Please wait for an email confirmation of the transaction.' : 'Please indicate the credit card number, its date of expiry and its CVV.'
 
     return res.json({
       payload: speechResponse,
