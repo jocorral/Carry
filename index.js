@@ -52,6 +52,20 @@ restService.post("/webhook", function (req, res) {
       payload: speechResponse,
       //data: speechResponse,
       fulfillmentText: speech,
+      /*fulfillmenMessages: [{
+        quickReplies: {
+          title: "Is this everything?",
+          quickReplies: [
+            "Yes", "No"
+          ]
+        },
+        platform: "GOOGLE ASSISTANT"
+      },
+      {
+        text: {
+          text: ["Dummy"]
+        }
+      }],*/
       speech: speech,
       displayText: speech,
       source: "webhook-echo-sample"
@@ -61,7 +75,7 @@ restService.post("/webhook", function (req, res) {
     var order = '';
     var totalCost = 0;
     // Calculate payment
-    
+
     return res.json({
       payload: speechResponse,
       //data: speechResponse,
@@ -76,7 +90,7 @@ restService.post("/webhook", function (req, res) {
     //This variable indicates whether the user wants to pay the order by credit card or manually
     var payByCredCard = false;
     //If payment wants to be done by hand, save order in db, elsewise, launch next intent
-    var speech = !payByCredCard? 'You selected the payment to be manual. Please wait for an email confirmation of the transaction.' : 'Please indicate the credit card number, its date of expiry and its CVV.'
+    var speech = !payByCredCard ? 'You selected the payment to be manual. Please wait for an email confirmation of the transaction.' : 'Please indicate the credit card number, its date of expiry and its CVV.'
 
     return res.json({
       payload: speechResponse,
@@ -106,7 +120,7 @@ restService.post("/webhook", function (req, res) {
       displayText: speech,
       source: "webhook-echo-sample"
     });
-  }  
+  }
   else {
     return res.json({
       payload: speechResponse,
