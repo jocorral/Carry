@@ -23,15 +23,15 @@ restService.post("/webhook", function (req, res) {
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
         speech = req.body.queryResult.parameters.numero !== 1 ?
-          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + 's, is this what you want to order?' :
-          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', is this what you want to order?';
+          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + 's, is this everything that you want to order?' :
+          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', is this everything that you want to order?';
       } else {
-        speech = req.body.queryResult.parameters.plato ? req.body.queryResult.parameters.plato + ', is this what you want to order?' : "Something didn't go as planned, please repeat your request"
+        speech = req.body.queryResult.parameters.plato ? req.body.queryResult.parameters.plato + ', is this everything that you want to order?' : "Something didn't go as planned, please repeat your request"
       }
     }
-    req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero //&& req.body.queryResult.parameters.direccion
-      ? req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', is this what you want to order?'
-      : "Something didn't go as planned, please repeat your request";
+    /*req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero //&& req.body.queryResult.parameters.direccion
+      ? req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', is this everything that you want to order?'
+      : "Something didn't go as planned, please repeat your request";*/
 
     var speechResponse = {
       google: {
@@ -57,20 +57,61 @@ restService.post("/webhook", function (req, res) {
       source: "webhook-echo-sample"
     });
   }
-  else if(req.body.queryResult.intent.displayName == 'pay'){
+  else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
+    var order = '';
+    var totalCost = 0;
+    // Calculate payment
+    
     return res.json({
       payload: speechResponse,
       //data: speechResponse,
-      fulfillmentText: 'Nice! You have just paid your ' + req.body.queryResult.parameters.coste + '€' ,
+      fulfillmentText: 'Alright! The total cost of your order is ' + req.body.queryResult.parameters.coste + '€. Would you like to pay it now or pay it on your arrival?',
       speech: speech,
       displayText: speech,
       source: "webhook-echo-sample"
     });
-  }else{
+  }
+  else if (req.body.queryResult.intent.displayName == 'paymentMethod') {
+    var totalCost = 0;
+    //This variable indicates whether the user wants to pay the order by credit card or manually
+    var payByCredCard = false;
+    //If payment wants to be done by hand, save order in db, elsewise, launch next intent
+    var speech = !payByCredCard? 'You selected the payment to be manual. Please wait for an email confirmation of the transaction.' : 'Please indicate the credit card number, its date of expiry and its CVV.'
+
     return res.json({
       payload: speechResponse,
       //data: speechResponse,
-      fulfillmentText: 'Something didn\'t go as planned, the intent name is: ' + req.body.queryResult.intent.displayName,
+      fulfillmentText: speech,
+      speech: speech,
+      displayText: speech,
+      source: "webhook-echo-sample"
+    });
+  }
+  else if (req.body.queryResult.intent.displayName == 'pay') {
+    var transactionCost = 0;
+    var creditCardPAN = '';
+    var validity = '';
+    var cvv = '';
+    var saveCreditCard = false;
+
+    //If it wants to be saved, save it in mongo
+    //Call external API and make payment
+    //Call external API to send an email
+
+    return res.json({
+      payload: speechResponse,
+      //data: speechResponse,
+      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction.',
+      speech: speech,
+      displayText: speech,
+      source: "webhook-echo-sample"
+    });
+  }  
+  else {
+    return res.json({
+      payload: speechResponse,
+      //data: speechResponse,
+      fulfillmentText: 'Something didn\'t go as planned, please restart the order.',
       speech: speech,
       displayText: speech,
       source: "webhook-echo-sample"
