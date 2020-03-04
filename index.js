@@ -92,7 +92,13 @@ restService.post("/webhook", function (req, res) {
   else if (req.body.queryResult.intent.displayName == 'paymentMethod') {
     var totalCost = 0;
     //This variable indicates whether the user wants to pay the order by credit card or manually
-    var payByCredCard = false;
+    var payByCredCard = null;
+    if (req.body.queryResult && req.body.queryResult.parameters) {
+      payByCredCard = req.body.queryResult.parameters.method == 'creditCard' ? true : false;
+      // Calculate payment
+    }
+
+    if(payByCredCard != null)
     //If payment wants to be done by hand, save order in db, elsewise, launch next intent
     speech = !payByCredCard ? 'You selected the payment to be manual. Please wait for an email confirmation of the transaction.' : 'Please indicate the credit card number, its date of expiry and its CVV.'
 
