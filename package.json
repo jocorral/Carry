@@ -4,11 +4,16 @@
   "description": "Webhook para el PFM",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "server": "nodemon server.js"
   },
   "author": "jocorral",
   "dependencies": {
-    "body-parser": "^1.15.0",
-    "express": "^4.13.4"
+    "body-parser": "^1.19.0",
+    "express": "^4.13.4",
+    "mongoose": "^5.9.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
