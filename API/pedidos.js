@@ -9,8 +9,11 @@ router.get('/', (req, res) => {
 
 
 router.post('/', async(req, res) => {
-    const pedido = new Pedido({
-        numeroPedido: req.body.numeroPedido
+    const pedido = new Pedido({        
+        precio:req.body.precio,
+        fechaPedidoRealizado:req.body.fechaPedidoRealizado,
+        fechaRecepcionPedido:req.body.fechaRecepcionPedido,
+        valoracion:req.body.valoracion
     });
 
     try{

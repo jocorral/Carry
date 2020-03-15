@@ -1,7 +1,16 @@
 const mongoose = require('mongoose');
 const pedido = new mongoose.Schema({
-    numeroPedido : {
-        type:String
+    precio : {
+        type:Number
+    },
+    fechaPedidoRealizado : {
+        type:Date
+    },
+    fechaRecepcionPedido : {
+        type:Date
+    },
+    valoracion : {
+        type:Number
     }
 });
 
