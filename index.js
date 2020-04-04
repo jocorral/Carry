@@ -16,23 +16,29 @@ restService.use(bodyParser.json());
 restService.post("/webhook", function (req, res) {
   var PROJECT_ID = 'carry-lajhni';
   var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
-  var speech;
+  var speech = '';
 
 
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
+    //To switch between actions, confirm that the query brings parameters
     if (req.body.queryResult && req.body.queryResult.parameters) {
+      //Confirm that variable selectedAction exists
       if (req.body.queryResult.parameters.selectedAction) {
+        //If contains "to evaluate" the context will be of evaluation
         if(req.body.queryResult.parameters.selectedAction.includes('to evaluate')){
           //If an order wants to be evaluated, the context is set to evaluation
-          //Get list of delivered orders
+          // TODO Get list of delivered orders
           var listOfDeliveredOrders = [];
           var listString = '';
+          
+          // List of delivered orders will be stringified so that the assistant prints them
           if(listOfDeliveredOrders.length !== 0){
             for(let i = 0; i< listOfDeliveredOrders.length; i++){
-              listString = listString + i + ' - ' + listOfDeliveredOrders[i].Name +  '\n';
+              listString = listString + (i+1) + ' - ' + listOfDeliveredOrders[i].Name +  '\n';
             }
           }
 
+          // Return response to user
           return res.json({
             fulfillmentText: 'The list of delivered order is the following: ' + listString + ' which one of them do you want to evaluate?',
             speech: speech,
@@ -43,14 +49,16 @@ restService.post("/webhook", function (req, res) {
               }
             ]
           });
-        }else if(req.body.queryResult.parameters.selectedAction.includes('to cancel')){
+        }
+        //If contains "to cancel" the context will be of cancelation
+        else if(req.body.queryResult.parameters.selectedAction.includes('to cancel')){
           //If an order wants to be cancelled, the context is set to cancelation
           //Get list of active orders
           var listOfActiveOrders = [];
           var listString = '';
           if(listOfActiveOrders.length !== 0){
             for(let i = 0; i< listOfActiveOrders.length; i++){
-              listString = listString + i + ' - ' + listOfActiveOrders[i].Name +  '\n';
+              listString = listString + (i+1) + ' - ' + listOfActiveOrders[i].Name +  '\n';
             }
           }
           return res.json({
@@ -93,8 +101,52 @@ restService.post("/webhook", function (req, res) {
       }
     }
   }
+  else if (req.body.queryResult.intent.displayName == 'cancelOrder'){
+    if (req.body.queryResult && req.body.queryResult.parameters) {
+      if (req.body.queryResult.parameters.number) {
+        let number = req.body.queryResult.parameters.number;
+        return res.json({
+          fulfillmentText: 'Are you sure you want to cancel order number'+ number + '?',
+          outputContexts: [
+            {
+              name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelOrder-followup",
+              lifespanCount:4,
+              parameters: {
+                number: number
+              }
+            }
+          ]
+        });
+      }
+    }
+  }
+  else if (req.body.queryResult.intent.displayName == 'confirmCancelation'){
+    //To confirm a cancelation, confirm that the name of the context is the correct one
+    if(req.body.queryResult.outputContexts[0].name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelOrder-followup"){
+      //Then check that the variable number exists in that context
+      if(req.body.queryResult.outputContexts[0].parameters.number){
+        //Variable in number is not adapted to array, adapt it
+        let number = req.body.queryResult.outputContexts[0].parameters.number;
+        let arrayPosition = number - 1;
 
-  if (req.body.queryResult.intent.displayName == 'order') {
+        //TODO Make modifications on DB
+
+        //Return response to user
+        return res.json({
+          fulfillmentText: 'Order number ' + number + ' has been cancelled. (Array pos: ' + arrayPosition + ')',
+        });
+      }else{
+        return res.json({
+          fulfillmentText: 'Specified position could not be recovered from context, structure ' + JSON.stringify(req.body),
+        });
+      }
+    }else{
+      return res.json({
+        fulfillmentText: 'The current context is not the specified one ' + JSON.stringify(req.body),
+      });
+    }
+  }
+  else if (req.body.queryResult.intent.displayName == 'order') {
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
         speech = req.body.queryResult.parameters.numero !== 1 ?
@@ -207,7 +259,7 @@ restService.post("/webhook", function (req, res) {
     return res.json({
       payload: speechResponse,
       //data: speechResponse,
-      fulfillmentText: 'Something didn\'t go as planned, please restart the order. Current selected action was ' + req.body.queryResult.intent.displayName,
+      fulfillmentText: 'Something didn\'t go as planned, please restart the order. Current selected intent was ' + req.body.queryResult.intent.displayName,
       speech: speech,
       displayText: speech,
       source: "webhook-echo-sample"
