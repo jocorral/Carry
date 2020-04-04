@@ -124,7 +124,9 @@ restService.post("/webhook", function (req, res) {
     }
   }
   else if (req.body.queryResult.intent.displayName == 'confirmCancelation'){
+    //Variable to control if any of the context matches the specified context name
     let contextMatched = false;
+    //Check if there are any context
     if(req.body.queryResult.outputContexts){
       req.body.queryResult.outputContexts.forEach(context => {
         //Check if any of the context names matches the one that is being looked for
