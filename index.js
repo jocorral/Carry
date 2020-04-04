@@ -53,7 +53,7 @@ restService.post("/webhook", function (req, res) {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
                 lifespanCount:4,
                 parameters:{
-                  listOfDeliveredOrders = listOfDeliveredOrders
+                  deliveredorders = listOfDeliveredOrders
                 }
               }
             ]
@@ -65,6 +65,12 @@ restService.post("/webhook", function (req, res) {
           //Get list of active orders
           var listOfActiveOrders = [];
           var listString = '';
+          
+          listOfActiveOrders[0] = {"name":"June 23, 2019"};
+          listOfActiveOrders[1] = {"name":"June 24, 2019"};
+          listOfActiveOrders[2] = {"name":"June 25, 2019"};
+          listOfActiveOrders[3] = {"name":"June 26, 2019"};
+          listOfActiveOrders[4] = {"name":"June 27, 2019"};
           if(listOfActiveOrders.length !== 0){
             for(let i = 0; i< listOfActiveOrders.length; i++){
               listString = listString + (i+1) + ' - ' + listOfActiveOrders[i].name +  '\n';
@@ -76,7 +82,10 @@ restService.post("/webhook", function (req, res) {
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation",
-                lifespanCount:3
+                lifespanCount:3,
+                parameters:{
+                  activeorders = listOfActiveOrders
+                }
               }
             ]
           });
@@ -112,23 +121,23 @@ restService.post("/webhook", function (req, res) {
   }
   else if (req.body.queryResult.intent.displayName == 'cancelOrder'){
     var contextMatched = false;
-    var deliveredOrdersList;
-    //Recover the list of Delivered orders from context
+    var activeOrdersList;
+    //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context =>{
       //Find the correct context
-      if(context.name === projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation){
+      if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation"){
         contextMatched = true;
         //Find if the variable exists
-        if(context.parameters.listOfDeliveredOrders){
-          //Assign variable to the delivered order list
-          deliveredOrdersList = context.parameters.listOfDeliveredOrders;
+        if(context.parameters.activeorders){
+          //Assign variable to the active order list
+          activeOrdersList = context.parameters.activeorders;
         }
       }
     });
 
     if(!contextMatched){
       return res.json({
-        fulfillmentText: 'Some error with the database took place, please try again'
+        fulfillmentText: 'Some error with the database took place, please try again.'
       });
     }
 
@@ -138,13 +147,14 @@ restService.post("/webhook", function (req, res) {
       if (req.body.queryResult.parameters.number) {
         let number = req.body.queryResult.parameters.number;
         //If the inserted number is bigger than the deliver order list length, don't allow it
-        if(number > deliveredOrdersList.length){
+        if(number > activeOrdersList.length){
           //Return error response to the user
           return res.json({
-            fulfillmentText: 'The specified number must be smaller than the list lenght, please say a number between 1 and '+ deliveredOrdersList.length,
+            fulfillmentText: 'The specified number must be smaller than the list lenght, please say a number between 1 and '+ activeOrdersList.length,
             outputContexts: [
               {
-                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation"
+                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation",
+                lifespanCount:3
               }
             ]
           });
