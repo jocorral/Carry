@@ -29,12 +29,18 @@ restService.post("/webhook", function (req, res) {
           //If an order wants to be evaluated, the context is set to evaluation
           // TODO Get list of delivered orders
           var listOfDeliveredOrders = [];
+          listOfDeliveredOrders[0] = {"name":"June 23, 2019"};
+          listOfDeliveredOrders[1] = {"name":"June 24, 2019"};
+          listOfDeliveredOrders[2] = {"name":"June 25, 2019"};
+          listOfDeliveredOrders[3] = {"name":"June 26, 2019"};
+          listOfDeliveredOrders[4] = {"name":"June 27, 2019"};
+
           var listString = '';
           
           // List of delivered orders will be stringified so that the assistant prints them
           if(listOfDeliveredOrders.length !== 0){
             for(let i = 0; i< listOfDeliveredOrders.length; i++){
-              listString = listString + (i+1) + ' - ' + listOfDeliveredOrders[i].Name +  '\n';
+              listString = listString + (i+1) + ' - ' + listOfDeliveredOrders[i].name +  '\n';
             }
           }
 
@@ -45,7 +51,10 @@ restService.post("/webhook", function (req, res) {
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
-                lifespanCount:4
+                lifespanCount:4,
+                parameters:{
+                  listOfDeliveredOrders = listOfDeliveredOrders
+                }
               }
             ]
           });
@@ -58,7 +67,7 @@ restService.post("/webhook", function (req, res) {
           var listString = '';
           if(listOfActiveOrders.length !== 0){
             for(let i = 0; i< listOfActiveOrders.length; i++){
-              listString = listString + (i+1) + ' - ' + listOfActiveOrders[i].Name +  '\n';
+              listString = listString + (i+1) + ' - ' + listOfActiveOrders[i].name +  '\n';
             }
           }
           return res.json({
@@ -102,24 +111,58 @@ restService.post("/webhook", function (req, res) {
     }
   }
   else if (req.body.queryResult.intent.displayName == 'cancelOrder'){
+    var contextMatched = false;
+    var deliveredOrdersList;
+    //Recover the list of Delivered orders from context
+    req.body.queryResult.outputContexts.forEach(context =>{
+      //Find the correct context
+      if(context.name === projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation){
+        contextMatched = true;
+        //Find if the variable exists
+        if(context.parameters.listOfDeliveredOrders){
+          //Assign variable to the delivered order list
+          deliveredOrdersList = context.parameters.listOfDeliveredOrders;
+        }
+      }
+    });
+
+    if(!contextMatched){
+      return res.json({
+        fulfillmentText: 'Some error with the database took place, please try again'
+      });
+    }
+
     //Check if it contains parameters
     if (req.body.queryResult && req.body.queryResult.parameters) {
       //Number parameter must exist
       if (req.body.queryResult.parameters.number) {
         let number = req.body.queryResult.parameters.number;
-        //Return the response to user, adding the parameter to context
-        return res.json({
-          fulfillmentText: 'Are you sure you want to cancel order number '+ number + '?',
-          outputContexts: [
-            {
-              name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelorder-followup",
-              lifespanCount:4,
-              parameters: {
-                number: number
+        //If the inserted number is bigger than the deliver order list length, don't allow it
+        if(number > deliveredOrdersList.length){
+          //Return error response to the user
+          return res.json({
+            fulfillmentText: 'The specified number must be smaller than the list lenght, please say a number between 1 and '+ deliveredOrdersList.length,
+            outputContexts: [
+              {
+                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation"
               }
-            }
-          ]
-        });
+            ]
+          });
+        }else{
+          //Return the response to user, adding the parameter to context
+          return res.json({
+            fulfillmentText: 'Are you sure you want to cancel order number '+ number + '?',
+            outputContexts: [
+              {
+                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelorder-followup",
+                lifespanCount:4,
+                parameters: {
+                  number: number
+                }
+              }
+            ]
+          });
+        }
       }
     }
   }
