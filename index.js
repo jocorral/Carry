@@ -77,11 +77,12 @@ restService.post("/webhook", function (req, res) {
         }else{
           //In any other case, a help message will be prompted
           return res.json({
-            fulfillmentText: 'I\'m sorry, i wasn\'t able to understand what you said, try with something like \"I want to make an order.\", \"I\'d like to evaluate an order.\", or \"I would like to cancel an active order.\".',
+            fulfillmentText: 'I\'m sorry, I wasn\'t able to understand what you said, try with something like \"I want to make an order.\", \"I\'d like to evaluate an order.\", or \"I would like to cancel an active order.\".',
             speech: speech,
             outputContexts:[
               {
-                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/DefaultWelcomeIntent-followup"
+                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_selection_error",
+                lifespanCount:5
               }
             ]
           });
