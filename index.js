@@ -27,8 +27,10 @@ restService.post("/webhook", function (req, res) {
           //Get list of delivered orders
           var listOfDeliveredOrders = [];
           var listString = '';
-          for(let i = 0; i< listOfDeliveredOrders.length; i++){
-            listString = listString + i + ' - ' + listOfDeliveredOrders[i].Name +  '\n';
+          if(listOfDeliveredOrders.length !== 0){
+            for(let i = 0; i< listOfDeliveredOrders.length; i++){
+              listString = listString + i + ' - ' + listOfDeliveredOrders[i].Name +  '\n';
+            }
           }
 
           return res.json({
@@ -46,7 +48,7 @@ restService.post("/webhook", function (req, res) {
           //Get list of active orders
           var listOfActiveOrders = [];
           var listString = '';
-          if(rders.length !== 0){
+          if(listOfActiveOrders.length !== 0){
             for(let i = 0; i< listOfActiveOrders.length; i++){
               listString = listString + i + ' - ' + listOfActiveOrders[i].Name +  '\n';
             }
