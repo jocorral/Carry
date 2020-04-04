@@ -34,7 +34,7 @@ restService.post("/webhook", function (req, res) {
           }
 
           return res.json({
-            fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to evaluate?',
+            fulfillmentText: 'The list of delivered order is the following: ' + listString + ' which one of them do you want to evaluate?',
             speech: speech,
             outputContexts: [
               {
