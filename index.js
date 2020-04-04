@@ -22,53 +22,51 @@ restService.post("/webhook", function (req, res) {
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.selectedAction) {
-        if(req.body.queryResult.parameters.selectedAction.includes('evaluate')){
-          //If an order wants to be evaluated, the context is set to evaluation
-          //Get list of delivered orders
-          var listOfDeliveredOrders = [];
-          var listString = '';
-          for(let i = 0; i< listOfDeliveredOrders.length; i++){
-            listString = listString + i + ' - ' + listOfDeliveredOrders[i].Name +  '\n';
-          }
+        // if(req.body.queryResult.parameters.selectedAction.includes('to evaluate')){
+        //   //If an order wants to be evaluated, the context is set to evaluation
+        //   //Get list of delivered orders
+        //   var listOfDeliveredOrders = [];
+        //   var listString = '';
+        //   for(let i = 0; i< listOfDeliveredOrders.length; i++){
+        //     listString = listString + i + ' - ' + listOfDeliveredOrders[i].Name +  '\n';
+        //   }
 
-          return res.json({
-            fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to evaluate?',
-            speech: speech,
-            outputContexts: [
-              {
-                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
-                lifespanCount:4
-              }
-            ]
-          });
-        }else if(req.body.queryResult.parameters.selectedAction.includes('cancel')){
-          //If an order wants to be cancelled, the context is set to cancelation
-          //Get list of active orders
-          var listOfActiveOrders = [];
-          var listString = '';
-          for(let i = 0; i< listOfActiveOrders.length; i++){
-            listString = listString + i + ' - ' + listOfActiveOrders[i].Name +  '\n';
-          }
+        //   return res.json({
+        //     fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to evaluate?',
+        //     speech: speech,
+        //     outputContexts: [
+        //       {
+        //         name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
+        //         lifespanCount:4
+        //       }
+        //     ]
+        //   });
+        // }else if(req.body.queryResult.parameters.selectedAction.includes('to cancel')){
+        //   //If an order wants to be cancelled, the context is set to cancelation
+        //   //Get list of active orders
+        //   var listOfActiveOrders = [];
+        //   var listString = '';
+        //   for(let i = 0; i< listOfActiveOrders.length; i++){
+        //     listString = listString + i + ' - ' + listOfActiveOrders[i].Name +  '\n';
+        //   }
 
-          return res.json({
-            fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
-            speech: speech,
-            outputContexts: [
-              {
-                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation",
-                lifespanCount:3
-              }
-            ]
-          });
-        }else if(req.body.queryResult.parameters.selectedAction.includes('to make') ||
-        req.body.queryResult.parameters.selectedAction.includes('to place') ||
-        req.body.queryResult.parameters.selectedAction.includes('to order')){
+        //   return res.json({
+        //     fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
+        //     speech: speech,
+        //     outputContexts: [
+        //       {
+        //         name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation",
+        //         lifespanCount:3
+        //       }
+        //     ]
+        //   });
+        // }else 
+        if(req.body.queryResult.parameters.selectedAction.includes('to make') ||
+                 req.body.queryResult.parameters.selectedAction.includes('to place') ||
+                 req.body.queryResult.parameters.selectedAction.includes('to order')){
           //If an order wants to be cancelled, the context is set to cancelation
-          selectedContext.name = contextName + 'await_order';
-          selectedContext.lifespanCount = 20;
           return res.json({
             fulfillmentText: 'Where do you want to make the order and for what time do you want it?',
-            speech: speech,
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_order",
@@ -76,18 +74,19 @@ restService.post("/webhook", function (req, res) {
               }
             ]
           });
-        }else{
-          //In any other case, a help message will be prompted
-          return res.json({
-            fulfillmentText: 'I\'m sorry, i wasn\'t able to understand what you said, try with something like \"I want to make an order.\", \"I\'d like to evaluate an order.\", or \"I would like to cancel an active order.\".',
-            speech: speech,
-            outputContexts:[
-              {
-                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/DefaultWelcomeIntent-followup"
-              }
-            ]
-          });
         }
+        // else{
+        //   //In any other case, a help message will be prompted
+        //   return res.json({
+        //     fulfillmentText: 'I\'m sorry, i wasn\'t able to understand what you said, try with something like \"I want to make an order.\", \"I\'d like to evaluate an order.\", or \"I would like to cancel an active order.\".',
+        //     speech: speech,
+        //     outputContexts:[
+        //       {
+        //         name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/DefaultWelcomeIntent-followup"
+        //       }
+        //     ]
+        //   });
+        // }
       }
     }
   }
