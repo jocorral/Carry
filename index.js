@@ -215,6 +215,19 @@ restService.post("/webhook", function (req, res) {
     }
 
   }
+  else if (req.body.queryResult.intent.displayName == 'abortCancelation'){
+    //Return response to user directly
+    return res.json({
+      fulfillmentText: 'Then, what else do you want to do?',
+      outputContexts : [
+        {
+          name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_selection_error",
+          lifespanCount:1
+        }
+      ]
+    });
+
+  }
   else if (req.body.queryResult.intent.displayName == 'order') {
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
