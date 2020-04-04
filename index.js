@@ -18,7 +18,7 @@ restService.post("/webhook", function (req, res) {
   var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
   var speech = '';
 
-
+  //Check if the current intent name matches to its logic
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
     //To switch between actions, confirm that the query brings parameters
     if (req.body.queryResult && req.body.queryResult.parameters) {
@@ -102,14 +102,17 @@ restService.post("/webhook", function (req, res) {
     }
   }
   else if (req.body.queryResult.intent.displayName == 'cancelOrder'){
+    //Check if it contains parameters
     if (req.body.queryResult && req.body.queryResult.parameters) {
+      //Number parameter must exist
       if (req.body.queryResult.parameters.number) {
         let number = req.body.queryResult.parameters.number;
+        //Return the response to user, adding the parameter to context
         return res.json({
-          fulfillmentText: 'Are you sure you want to cancel order number'+ number + '?',
+          fulfillmentText: 'Are you sure you want to cancel order number '+ number + '?',
           outputContexts: [
             {
-              name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelOrder-followup",
+              name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelorder-followup",
               lifespanCount:4,
               parameters: {
                 number: number
@@ -121,30 +124,41 @@ restService.post("/webhook", function (req, res) {
     }
   }
   else if (req.body.queryResult.intent.displayName == 'confirmCancelation'){
-    //To confirm a cancelation, confirm that the name of the context is the correct one
-    if(req.body.queryResult.outputContexts[0].name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelOrder-followup"){
-      //Then check that the variable number exists in that context
-      if(req.body.queryResult.outputContexts[0].parameters.number){
-        //Variable in number is not adapted to array, adapt it
-        let number = req.body.queryResult.outputContexts[0].parameters.number;
-        let arrayPosition = number - 1;
+    let contextMatched = false;
+    if(req.body.queryResult.outputContexts){
+      req.body.queryResult.outputContexts.forEach(context => {
+        //Check if any of the context names matches the one that is being looked for
+        if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelorder-followup"){
+          //If context matches, set control variable to true
+          contextMatched = true;
+          //Then check that the variable number exists in that context
+          if(req.body.queryResult.outputContexts[0].parameters.number){
+            //Variable in number is not adapted to array, adapt it
+            let number = req.body.queryResult.outputContexts[0].parameters.number;
+            let arrayPosition = number - 1;
 
-        //TODO Make modifications on DB
+            //TODO Make modifications on DB
 
-        //Return response to user
-        return res.json({
-          fulfillmentText: 'Order number ' + number + ' has been cancelled. (Array pos: ' + arrayPosition + ')',
-        });
-      }else{
-        return res.json({
-          fulfillmentText: 'Specified position could not be recovered from context, structure ' + JSON.stringify(req.body),
-        });
-      }
-    }else{
-      return res.json({
-        fulfillmentText: 'The current context is not the specified one ' + JSON.stringify(req.body),
+            //Return response to user
+            return res.json({
+              fulfillmentText: 'Order number ' + number + ' has been cancelled. (Array pos: ' + arrayPosition + ')',
+            });
+          }else{
+            return res.json({
+              fulfillmentText: 'Specified position could not be recovered from context, structure ' + JSON.stringify(req.body),
+            });
+          }
+        }
       });
     }
+
+    //Check if context was not found
+    if(!contextMatched){
+      return res.json({
+        fulfillmentText: 'The name of the context was not found between the current context list ' + JSON.stringify(req.body.queryResult.outputContexts),
+      });
+    }
+
   }
   else if (req.body.queryResult.intent.displayName == 'order') {
     if (req.body.queryResult && req.body.queryResult.parameters) {
