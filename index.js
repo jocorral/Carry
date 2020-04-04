@@ -20,59 +20,63 @@ restService.post("/webhook", function (req, res) {
 
 
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
-    var contextName = "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/";
-    var selectedContext = {
-      name:"",
-      lifespanCount:0
-    }
+    // var contextName = "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/";
+    // var selectedContext = {
+    //   name:"",
+    //   lifespanCount:0
+    // }
 
 
-    if (req.body.queryResult && req.body.queryResult.parameters) {
-      if (req.body.queryResult.parameters.selectedAction) {
-        if(req.body.queryResult.parameters.selectedAction.includes('evaluate')){
-          //If an order wants to be evaluated, the context is set to evaluation
-          selectedContext.name = contextName + 'await_evaluation';
-          selectedContext.lifespanCount = 4;
-          return res.json({
-            outputContexts: [
-              selectedContext
-            ],
-            fulfillmentText: speech,
-            speech: speech
-          });
-        }else if(req.body.queryResult.parameters.selectedAction.includes('cancel')){
-          //If an order wants to be cancelled, the context is set to cancelation
-          selectedContext.name = contextName + 'await_cancelation';
-          selectedContext.lifespanCount = 3;
-          return res.json({
-            outputContexts: [
-              selectedContext
-            ],
-            fulfillmentText: speech,
-            speech: speech
-          });
-        }else if(req.body.queryResult.parameters.selectedAction.includes('to make') ||
-        req.body.queryResult.parameters.selectedAction.includes('to place') ||
-        req.body.queryResult.parameters.selectedAction.includes('to order')){
-          //If an order wants to be cancelled, the context is set to cancelation
-          selectedContext.name = contextName + 'await_order';
-          selectedContext.lifespanCount = 20;
-          return res.json({
-            outputContexts: [
-              selectedContext
-            ],
-            fulfillmentText: speech,
-            speech: speech
-          });
-        }else{
-          //In any other case, a help message will be prompted
-          return res.json({
-            fulfillmentText: 'I\'m sorry, i wasn\'t able to understand what you said, try with something like \"I want to make an order.\", or \"I\'d like to evaluate an order.\".',
-            speech: speech
-          });
-        }
-      }
-    }
+    // if (req.body.queryResult && req.body.queryResult.parameters) {
+    //   if (req.body.queryResult.parameters.selectedAction) {
+    //     if(req.body.queryResult.parameters.selectedAction.includes('evaluate')){
+    //       //If an order wants to be evaluated, the context is set to evaluation
+    //       selectedContext.name = contextName + 'await_evaluation';
+    //       selectedContext.lifespanCount = 4;
+    //       return res.json({
+    //         outputContexts: [
+    //           selectedContext
+    //         ],
+    //         fulfillmentText: speech,
+    //         speech: speech
+    //       });
+    //     }else if(req.body.queryResult.parameters.selectedAction.includes('cancel')){
+    //       //If an order wants to be cancelled, the context is set to cancelation
+    //       selectedContext.name = contextName + 'await_cancelation';
+    //       selectedContext.lifespanCount = 3;
+    //       return res.json({
+    //         outputContexts: [
+    //           selectedContext
+    //         ],
+    //         fulfillmentText: speech,
+    //         speech: speech
+    //       });
+    //     }else if(req.body.queryResult.parameters.selectedAction.includes('to make') ||
+    //     req.body.queryResult.parameters.selectedAction.includes('to place') ||
+    //     req.body.queryResult.parameters.selectedAction.includes('to order')){
+    //       //If an order wants to be cancelled, the context is set to cancelation
+    //       selectedContext.name = contextName + 'await_order';
+    //       selectedContext.lifespanCount = 20;
+    //       return res.json({
+    //         outputContexts: [
+    //           selectedContext
+    //         ],
+    //         fulfillmentText: speech,
+    //         speech: speech
+    //       });
+    //     }else{
+    //       //In any other case, a help message will be prompted
+    //       return res.json({
+    //         fulfillmentText: 'I\'m sorry, i wasn\'t able to understand what you said, try with something like \"I want to make an order.\", or \"I\'d like to evaluate an order.\".',
+    //         speech: speech
+    //       });
+    //     }
+    //   }
+    // }
+    return res.json({
+      fulfillmentText: 'Follow up request called',
+      speech: speech
+    });
   }
 
   if (req.body.queryResult.intent.displayName == 'order') {
