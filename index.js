@@ -53,7 +53,7 @@ restService.post("/webhook", function (req, res) {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
                 lifespanCount:4,
                 parameters:{
-                  deliveredorders = listOfDeliveredOrders
+                  "deliveredorders" : listOfDeliveredOrders
                 }
               }
             ]
@@ -84,7 +84,7 @@ restService.post("/webhook", function (req, res) {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation",
                 lifespanCount:3,
                 parameters:{
-                  activeorders = listOfActiveOrders
+                  "activeorders" : listOfActiveOrders
                 }
               }
             ]
