@@ -74,8 +74,14 @@ restService.post("/webhook", function (req, res) {
     //   }
     // }
     return res.json({
-      fulfillmentText: 'Follow up request called ' + req.body.queryResult.parameters.selectedAction + ' ' + req.body.queryResult.parameters.selectedAction.includes('to'),
-      speech: speech
+      fulfillmentText: 'Where do you want to make the order and for what time do you want it?',
+      speech: speech,
+      outputContexts: [
+        {
+          name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_order",
+          lifespanCount:21
+        }
+      ]
     });
   }
 
