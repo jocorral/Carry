@@ -134,9 +134,9 @@ restService.post("/webhook", function (req, res) {
           //If context matches, set control variable to true
           contextMatched = true;
           //Then check that the variable number exists in that context
-          if(req.body.queryResult.outputContexts[0].parameters.number){
+          if(context.parameters.number){
             //Variable in number is not adapted to array, adapt it
-            let number = req.body.queryResult.outputContexts[0].parameters.number;
+            let number = context.parameters.number;
             let arrayPosition = number - 1;
 
             //TODO Make modifications on DB
