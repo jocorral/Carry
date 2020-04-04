@@ -147,7 +147,7 @@ restService.post("/webhook", function (req, res) {
             });
           }else{
             return res.json({
-              fulfillmentText: 'Specified position could not be recovered from context, structure ' + JSON.stringify(req.body),
+              fulfillmentText: 'Context did not contain the necesary parameter ' + JSON.stringify(context),
             });
           }
         }
