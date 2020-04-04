@@ -65,7 +65,8 @@ restService.post("/webhook", function (req, res) {
           });
         }else if(req.body.queryResult.parameters.selectedAction.includes('to make') ||
                  req.body.queryResult.parameters.selectedAction.includes('to place') ||
-                 req.body.queryResult.parameters.selectedAction.includes('to order')){
+                 req.body.queryResult.parameters.selectedAction.includes('to order'))
+                 {
           //If an order wants to be cancelled, the context is set to cancelation
           return res.json({
             fulfillmentText: 'Where do you want to make the order and for what time do you want it?',
@@ -84,7 +85,7 @@ restService.post("/webhook", function (req, res) {
             outputContexts:[
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_selection_error",
-                lifespanCount:5
+                lifespanCount:1
               }
             ]
           });
