@@ -74,7 +74,7 @@ restService.post("/webhook", function (req, res) {
     //   }
     // }
     return res.json({
-      fulfillmentText: 'Follow up request called',
+      fulfillmentText: 'Follow up request called ' + req.body.queryResult.parameters.selectedAction,
       speech: speech
     });
   }
