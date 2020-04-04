@@ -206,7 +206,7 @@ restService.post("/webhook", function (req, res) {
     return res.json({
       payload: speechResponse,
       //data: speechResponse,
-      fulfillmentText: 'Something didn\'t go as planned, please restart the order.',
+      fulfillmentText: 'Something didn\'t go as planned, please restart the order. Current selected action was ' + req.body.queryResult.intent.displayName,
       speech: speech,
       displayText: speech,
       source: "webhook-echo-sample"
