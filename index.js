@@ -19,6 +19,62 @@ restService.post("/webhook", function (req, res) {
   var speech;
 
 
+  if (req.body.queryResult.intent.displayName == 'actionSelection'){
+    var contextName = "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/";
+    var selectedContext = {
+      name:"",
+      lifespanCount:0
+    }
+
+
+    if (req.body.queryResult && req.body.queryResult.parameters) {
+      if (req.body.queryResult.parameters.selectedAction) {
+        if(req.body.queryResult.parameters.selectedAction.includes('evaluate')){
+          //If an order wants to be evaluated, the context is set to evaluation
+          selectedContext.name = contextName + 'await_evaluation';
+          selectedContext.lifespanCount = 4;
+          return res.json({
+            outputContexts: [
+              selectedContext
+            ],
+            fulfillmentText: speech,
+            speech: speech
+          });
+        }else if(req.body.queryResult.parameters.selectedAction.includes('cancel')){
+          //If an order wants to be cancelled, the context is set to cancelation
+          selectedContext.name = contextName + 'await_cancelation';
+          selectedContext.lifespanCount = 3;
+          return res.json({
+            outputContexts: [
+              selectedContext
+            ],
+            fulfillmentText: speech,
+            speech: speech
+          });
+        }else if(req.body.queryResult.parameters.selectedAction.includes('to make') ||
+        req.body.queryResult.parameters.selectedAction.includes('to place') ||
+        req.body.queryResult.parameters.selectedAction.includes('to order')){
+          //If an order wants to be cancelled, the context is set to cancelation
+          selectedContext.name = contextName + 'await_order';
+          selectedContext.lifespanCount = 20;
+          return res.json({
+            outputContexts: [
+              selectedContext
+            ],
+            fulfillmentText: speech,
+            speech: speech
+          });
+        }else{
+          //In any other case, a help message will be prompted
+          return res.json({
+            fulfillmentText: 'I\'m sorry, i wasn\'t able to understand what you said, try with something like \"I want to make an order.\", or \"I\'d like to evaluate an order.\".',
+            speech: speech
+          });
+        }
+      }
+    }
+  }
+
   if (req.body.queryResult.intent.displayName == 'order') {
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
@@ -81,7 +137,6 @@ restService.post("/webhook", function (req, res) {
 
 
     return res.json({
-      payload: speechResponse,
       //data: speechResponse,
       fulfillmentText: speech,
       speech: speech,
@@ -103,7 +158,6 @@ restService.post("/webhook", function (req, res) {
     speech = !payByCredCard ? 'You selected the payment to be manual. Please wait for an email confirmation of the transaction.' : 'Please indicate the credit card number, its date of expiry and its CVV.'
 
     return res.json({
-      payload: speechResponse,
       //data: speechResponse,
       fulfillmentText: speech,
       speech: speech,
@@ -115,7 +169,7 @@ restService.post("/webhook", function (req, res) {
     var transactionCost = 0;
     var creditCardPAN = '';
     var validity = '';
-    var cvv = '';
+    var cvc = '';
     var saveCreditCard = false;
 
     //If it wants to be saved, save it in mongo
@@ -123,7 +177,6 @@ restService.post("/webhook", function (req, res) {
     //Call external API to send an email
 
     return res.json({
-      payload: speechResponse,
       //data: speechResponse,
       fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction.',
       speech: speech,
