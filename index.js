@@ -2,6 +2,7 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const jwt = require('jsonwebtoken');
 
 const restService = express();
 
@@ -55,7 +56,7 @@ restService.post("/webhook", function (req, res) {
                 lifespanCount:5,
                 parameters:{
                   "deliveredorders" : listOfDeliveredOrders,
-                  "body" : JSON.stringify(req.body)
+                  "body" : JSON.stringify(jwt.decode(req.body.originalDetectIntentRequest.payload.user.idToken))
                 }
               }
             ]
