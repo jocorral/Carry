@@ -288,6 +288,7 @@ restService.post("/webhook", function (req, res) {
   }
   else if (req.body.queryResult.intent.displayName == 'setEvaluationValue'){
     let insertedValue = 0;
+    let selectedPosition = 0;
     //Check if inserted value is not between 1 and 10
     if(req.body.queryResult.parameters.value){
       insertedValue = parseInt(req.body.queryResult.parameters.value);
@@ -300,29 +301,49 @@ restService.post("/webhook", function (req, res) {
           }]
         });
       }
+      else{
+        req.body.queryResult.outputContexts.forEach(context => {
+          if(context.name == "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateOrder-followup"){
+            if(context.parameters && context.parameters.number){
+              selectedPosition = number;
+            }
+          }
+        });
+        return res.json({
+          fulfillmentText: 'You want to set a value of '+ insertedValue+ ' in the position number ' + selectedPosition + ', is that right?',
+          outputContexts : [{
+            name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/setEvaluationValue-followup",
+            lifespanCount:2,
+            parameters:[
+              {
+                "evaluationposition" : selectedPosition,
+                "evaluationvalue" : insertedValue
+              }
+            ]
+          }]
+        });
+      }
     }
   }
   else if (req.body.queryResult.intent.displayName == 'confirmEvaluation'){
     var contextMatched = false;
+    var selectedposition;
+    var insertedValue;
     var arrayPosition;
-    var value;
     //Recover the list of delivered orders from context
     req.body.queryResult.outputContexts.forEach(context =>{
       //Find the correct context
-      if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup"){
+      if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/setEvaluationValue-followup"){
         contextMatched = true;
         //Find if the variable exists
-        if(context.parameters.deliveredorders){
-          //Get the position that is being evaluated
-          arrayPosition = context.parameters.number - 1;
-        }
-      }
-      else if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/setEvaluationValue-followup"){
-        contextMatched = true;
-        //Find if the variable exists
-        if(context.parameters.value){
+        if(context.parameters.evaluationposition){
           //Assign variable to the delivered order list
-          value = context.parameters.value;
+          selectedposition = context.parameters.evaluationposition;
+          arrayPosition = selectedposition - 1;
+        }
+        if(context.parameters.evaluationvalue){
+          //Assign variable to the delivered order list
+          insertedValue = context.parameters.evaluationvalue;
         }
       }
     });
@@ -338,7 +359,7 @@ restService.post("/webhook", function (req, res) {
       //TODO manage values in DB
 
       return res.json({
-        fulfillmentText: 'The position ' + (arrayPosition+1) + ' has been evaluated with a ' + value+ '.'
+        fulfillmentText: 'The position ' + selectedposition + ' has been evaluated with a ' + insertedValue + '. (Array position ' + arrayPosition + ')'
       });
     }
   }
