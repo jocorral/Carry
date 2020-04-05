@@ -294,7 +294,7 @@ restService.post("/webhook", function (req, res) {
     let selectedPosition;
     
     req.body.queryResult.outputContexts.forEach(context => {
-      if(context.name == "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateOrder-followup"){
+      if(context.name == "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup"){
         if(context.parameters && context.parameters.number){
           selectedPosition = number;
         }
@@ -308,7 +308,7 @@ restService.post("/webhook", function (req, res) {
         return res.json({
           fulfillmentText: 'Please insert a value between 1 and 10, ' + insertedValue + ' is not between those limits.',
           outputContexts : [{
-            name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateOrder-followup",
+            name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
             lifespanCount:2,
             parameters: {
               "number": selectedPosition
