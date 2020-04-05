@@ -48,9 +48,6 @@ restService.post("/webhook", function (req, res) {
             }
           }
 
-          let userInformationIdToken = regExToGetIdTokenInfo.exec(req.body.originalDetectIntentRequest.payload.user.idToken);
-          let userInformationJSON = jwt.decode(userInformationIdToken);
-
 
           // Return response to user
           return res.json({
@@ -61,9 +58,7 @@ restService.post("/webhook", function (req, res) {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
                 lifespanCount:5,
                 parameters:{
-                  "deliveredorders" : listOfDeliveredOrders,
-                  "email" : userInformationJSON.email,
-                  "completejson" : JSON.stringify(userInformationJSON)
+                  "deliveredorders" : listOfDeliveredOrders
                 }
               }
             ]
@@ -120,6 +115,17 @@ restService.post("/webhook", function (req, res) {
           });
         }
         
+        else if(req.body.queryResult.parameters.selectedAction.includes('to test')){
+          let userInformationIdToken = regExToGetIdTokenInfo.exec(req.body.originalDetectIntentRequest.payload.user.idToken);
+          let userInformationJSON = jwt.decode(userInformationIdToken);
+          // Return response to user
+          return res.json({
+            fulfillmentText: 'Ok'
+            //"email" : userInformationJSON.email,
+            //"completejson" : JSON.stringify(userInformationJSON)
+          });
+        }
+
         //Prompt help text if the user makes an action that was not correct
         else{
           //In any other case, a help message will be prompted
