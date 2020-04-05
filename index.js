@@ -19,7 +19,7 @@ restService.post("/webhook", function (req, res) {
   var speech = '';
 
 
-  //Check if the current intent name matches to its logic
+  /* ACTION SELECTION - START */
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
     //To switch between actions, confirm that the query brings parameters
     if (req.body.queryResult && req.body.queryResult.parameters) {
@@ -27,7 +27,6 @@ restService.post("/webhook", function (req, res) {
       if (req.body.queryResult.parameters.selectedAction) {
         //If contains "to evaluate" the context will be of evaluation
         if(req.body.queryResult.parameters.selectedAction.includes('to evaluate')){
-          console.log('Evaluation selected as action');
           //If an order wants to be evaluated, the context is set to evaluation
           // TODO Get list of delivered orders
           var listOfDeliveredOrders = [];
@@ -94,6 +93,7 @@ restService.post("/webhook", function (req, res) {
           });
         }
 
+        //If contains "to make"/"to place"/"to order" the context will be creation
         else if(
           req.body.queryResult.parameters.selectedAction.includes('to make') ||
           req.body.queryResult.parameters.selectedAction.includes('to place') ||
@@ -111,6 +111,7 @@ restService.post("/webhook", function (req, res) {
           });
         }
         
+        //Prompt help text if the user makes an action that was not correct
         else{
           //In any other case, a help message will be prompted
           return res.json({
@@ -127,10 +128,10 @@ restService.post("/webhook", function (req, res) {
       }
     }
   }
+  /* ACTION SELECTION - END */
 
-
+  /* CANCELLATION RELATED ACTIONS - START */
   else if (req.body.queryResult.intent.displayName == 'cancelOrder'){
-    console.log('Order cancelation selected, output context are the following ' + JSON.stringify(req.body.queryResult.outputContexts));
     var contextMatched = false;
     var activeOrdersList;
     //Recover the list of active orders from context
@@ -156,12 +157,12 @@ restService.post("/webhook", function (req, res) {
     if (req.body.queryResult && req.body.queryResult.parameters) {
       //Number parameter must exist
       if (req.body.queryResult.parameters.number) {
-        let number = req.body.queryResult.parameters.number;
+        let number = parseInt(req.body.queryResult.parameters.number);
         //If the inserted number is bigger than the deliver order list length, don't allow it
-        if(number > activeOrdersList.length){
+        if(number > activeOrdersList.length || number < 1){
           //Return error response to the user
           return res.json({
-            fulfillmentText: 'The specified number must be smaller than the list lenght, please say a number between 1 and '+ activeOrdersList.length,
+            fulfillmentText: 'The specified number is not correct, please say a number between 1 and '+ activeOrdersList.length,
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation",
@@ -226,8 +227,10 @@ restService.post("/webhook", function (req, res) {
     }
 
   }
+  /* CANCELLATION RELATED ACTIONS - END */
 
 
+  /* EVALUATION RELATED ACTIONS - START */
   else if (req.body.queryResult.intent.displayName == 'evaluateOrder'){
     var contextMatched = false;
     var deliveredOrderList;
@@ -243,32 +246,34 @@ restService.post("/webhook", function (req, res) {
         }
       }
     });
-
     //If context wasn't found, send a message to user
     if(!contextMatched){
       return res.json({
         fulfillmentText: 'Some error with the context names took place, please try again.'
       });
     }
+
     //Check if it contains parameters
     if (req.body.queryResult && req.body.queryResult.parameters) {
       //Number parameter must exist
       if (req.body.queryResult.parameters.number) {
-        let number = req.body.queryResult.parameters.number;
+        let number = parseInt(req.body.queryResult.parameters.number);
         //If the inserted number is bigger than the deliver order list length, don't allow it
-        if(number > deliveredOrderList.length){
+        if(number > deliveredOrderList.length || number < 1){
           //Return error response to the user
           return res.json({
-            fulfillmentText: 'The specified number must be smaller than the list lenght, please say a number between 1 and '+ deliveredOrderList.length,
-            outputContexts: [
-              {
-                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
-                lifespanCount:5,
-                parameters:{
-                  "deliveredorders" : deliveredOrderList
-                }
-              }
-            ]
+            fulfillmentText: 'The specified number is not correct, please say a number between 1 and '+ deliveredOrderList.length + '.'
+            // ,
+            // outputContexts: [
+            //   {
+            //     name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
+            //     lifespanCount:5,
+            //     parameters:{
+            //       "deliveredorders" : deliveredOrderList,
+            //       "haderrors":true
+            //     }
+            //   }
+            // ]
           });
         }else{
           //Return the response to user, adding the parameter to context
@@ -289,10 +294,10 @@ restService.post("/webhook", function (req, res) {
     }
   }
   else if (req.body.queryResult.intent.displayName == 'setEvaluationValue'){
-    console.log('Evaluation value is being set');
     let insertedValue = 0;
     let selectedPosition;
     
+    //If the position was seelected previously, recover it.
     req.body.queryResult.outputContexts.forEach(context => {
       if(context.name == "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup"){
         if(context.parameters && context.parameters.number){
@@ -369,8 +374,9 @@ restService.post("/webhook", function (req, res) {
       });
     }
   }
+  /* EVALUATION RELATED ACTIONS - END */
 
-
+  /* ORDER RELATED ACTIONS - START */
   else if (req.body.queryResult.intent.displayName == 'order') {
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
@@ -480,6 +486,10 @@ restService.post("/webhook", function (req, res) {
       source: "webhook-echo-sample"
     });
   }
+  /* ORDER RELATED ACTIONS - START */
+
+  
+  /* NO RELATED ACTIONS */
   else {
     return res.json({
       payload: speechResponse,
@@ -490,8 +500,6 @@ restService.post("/webhook", function (req, res) {
       source: "webhook-echo-sample"
     });
   }
-
-
 });
 
 
