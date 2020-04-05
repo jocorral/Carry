@@ -296,7 +296,7 @@ restService.post("/webhook", function (req, res) {
     req.body.queryResult.outputContexts.forEach(context => {
       if(context.name == "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup"){
         if(context.parameters && context.parameters.number){
-          selectedPosition = number;
+          selectedPosition = context.parameters.number;
         }
       }
     });
