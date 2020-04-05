@@ -18,6 +18,7 @@ restService.post("/webhook", function (req, res) {
   var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
   var speech = '';
 
+
   //Check if the current intent name matches to its logic
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
     //To switch between actions, confirm that the query brings parameters
@@ -46,7 +47,7 @@ restService.post("/webhook", function (req, res) {
 
           // Return response to user
           return res.json({
-            fulfillmentText: 'The list of delivered order is the following: ' + listString + ' which one of them do you want to evaluate?',
+            fulfillmentText: 'The list of delivered orders is the following: ' + listString + ' which one of them do you want to evaluate?',
             speech: speech,
             outputContexts: [
               {
@@ -119,6 +120,8 @@ restService.post("/webhook", function (req, res) {
       }
     }
   }
+
+
   else if (req.body.queryResult.intent.displayName == 'cancelOrder'){
     var contextMatched = false;
     var activeOrdersList;
@@ -215,6 +218,8 @@ restService.post("/webhook", function (req, res) {
     }
 
   }
+
+
   else if (req.body.queryResult.intent.displayName == 'evaluateOrder'){
     var contextMatched = false;
     var deliveredOrderList;
@@ -250,7 +255,10 @@ restService.post("/webhook", function (req, res) {
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
-                lifespanCount:4
+                lifespanCount:4,
+                parameters:{
+                  "deliveredorders" : deliveredOrderList
+                }
               }
             ]
           });
@@ -261,7 +269,7 @@ restService.post("/webhook", function (req, res) {
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
-                lifespanCount:1,
+                lifespanCount:2,
                 parameters: {
                   number: number
                 }
@@ -270,6 +278,46 @@ restService.post("/webhook", function (req, res) {
           });
         }
       }
+    }
+  }
+  else if (req.body.queryResult.intent.displayName == 'confirmEvaluation'){
+    var contextMatched = false;
+    var arrayPosition;
+    var value;
+    //Recover the list of delivered orders from context
+    req.body.queryResult.outputContexts.forEach(context =>{
+      //Find the correct context
+      if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup"){
+        contextMatched = true;
+        //Find if the variable exists
+        if(context.parameters.deliveredorders){
+          //Get the position that is being evaluated
+          arrayPosition = context.parameters.number - 1;
+        }
+      }
+      else if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/setEvaluationValue-followup"){
+        contextMatched = true;
+        //Find if the variable exists
+        if(context.parameters.value){
+          //Assign variable to the delivered order list
+          value = context.parameters.value;
+        }
+      }
+    });
+
+    //If context wasn't found, send a message to user
+    if(!contextMatched){
+      return res.json({
+        fulfillmentText: 'Some error with the context names took place, please try again.'
+      });
+    }
+    //If everything is okay, save the value in database and indicate process finish to user.
+    else{
+      //TODO manage values in DB
+
+      return res.json({
+        fulfillmentText: 'The position ' + (arrayPosition+1) + ' has been evaluated with a ' + value+ '.'
+      });
     }
   }
 
