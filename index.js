@@ -174,7 +174,7 @@ restService.post("/webhook", function (req, res) {
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelorder-followup",
-                lifespanCount:4,
+                lifespanCount:2,
                 parameters: {
                   number: number
                 }
