@@ -18,9 +18,6 @@ restService.post("/webhook", function (req, res) {
   var PROJECT_ID = 'carry-lajhni';
   var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
   var speech = '';
-  var regExToGetIdTokenInfo = new RegExp('(?<=\.)(.*?)(?=\.)', 'g');
-
-
 
   /* ACTION SELECTION - START */
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
@@ -116,6 +113,7 @@ restService.post("/webhook", function (req, res) {
         }
         
         else if(req.body.queryResult.parameters.selectedAction.includes('to test')){
+          //var regExToGetIdTokenInfo = new RegExp('(?<=\.)(.*?)(?=\.)', 'g');
           //let userInformationIdToken = regExToGetIdTokenInfo.exec(req.body.originalDetectIntentRequest.payload.user.idToken);
           //let userInformationJSON = jwt.decode(userInformationIdToken);
           // Return response to user
