@@ -162,7 +162,7 @@ restService.post("/webhook", function (req, res) {
         if(number > activeOrdersList.length || number < 1){
           //Return error response to the user
           return res.json({
-            fulfillmentText: 'The specified number is not correct, please say a number between 1 and '+ activeOrdersList.length,
+            fulfillmentText: 'The specified number is not correct because it\'s not between 1 and '+ activeOrdersList.length + '. Which one do you want to cancel?',
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_cancelation",
@@ -262,18 +262,7 @@ restService.post("/webhook", function (req, res) {
         if(number > deliveredOrderList.length || number < 1){
           //Return error response to the user
           return res.json({
-            fulfillmentText: 'The specified number is not correct, please say a number between 1 and '+ deliveredOrderList.length + '.'
-            // ,
-            // outputContexts: [
-            //   {
-            //     name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
-            //     lifespanCount:5,
-            //     parameters:{
-            //       "deliveredorders" : deliveredOrderList,
-            //       "haderrors":true
-            //     }
-            //   }
-            // ]
+            fulfillmentText: 'The specified number is not correct, it needs to be between 1 and '+ deliveredOrderList.length + '.'
           });
         }else{
           //Return the response to user, adding the parameter to context
