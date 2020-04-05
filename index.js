@@ -322,14 +322,10 @@ restService.post("/webhook", function (req, res) {
           outputContexts : [{
             name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/setEvaluationValue-followup",
             lifespanCount:2,
-            parameters:[
-              {
-                "evaluationposition" : selectedPosition
-              },
-              {
-                "evaluationvalue" : insertedValue
-              }
-            ]
+            parameters: {
+              "evaluationposition" : selectedPosition,
+              "evaluationvalue" : insertedValue
+            }
           }]
         });
       }
