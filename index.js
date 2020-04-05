@@ -18,6 +18,8 @@ restService.post("/webhook", function (req, res) {
   var PROJECT_ID = 'carry-lajhni';
   var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
   var speech = '';
+  var regExToGetIdTokenInfo = new RegExp('(?<=\.)(.*?)(?=\.)', 'g');
+
 
 
   /* ACTION SELECTION - START */
@@ -46,6 +48,10 @@ restService.post("/webhook", function (req, res) {
             }
           }
 
+          let userInformationIdToken = regExToGetIdTokenInfo.exec(req.body.originalDetectIntentRequest.payload.user.idToken);
+          let userInformationJSON = jwt.decode(userInformationIdToken);
+
+
           // Return response to user
           return res.json({
             fulfillmentText: 'The list of delivered orders is the following: ' + listString + ' which one of them do you want to evaluate?',
@@ -56,7 +62,8 @@ restService.post("/webhook", function (req, res) {
                 lifespanCount:5,
                 parameters:{
                   "deliveredorders" : listOfDeliveredOrders,
-                  "body" : JSON.stringify(jwt.decode(req.body.originalDetectIntentRequest.payload.user.idToken))
+                  "email" : userInformationJSON.email,
+                  "completejson" : JSON.stringify(userInformationJSON)
                 }
               }
             ]
