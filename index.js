@@ -2,7 +2,7 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
-//const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 const restService = express();
 
@@ -114,14 +114,14 @@ restService.post("/webhook", function (req, res) {
         
         //If contains "to test" is because it's being used for testing purposes
         else if(req.body.queryResult.parameters.selectedAction.includes('to test')){
-          //var regExToGetIdTokenInfo = new RegExp('(?<=\.)(.*?)(?=\.)', 'g');
-          //let userInformationIdToken = regExToGetIdTokenInfo.exec(req.body.originalDetectIntentRequest.payload.user.idToken);
-          //let userInformationJSON = jwt.decode(userInformationIdToken);
+          var regExToGetIdTokenInfo = new RegExp('(?<=\.)(.*?)(?=\.)', 'g');
+          let userInformationIdToken = regExToGetIdTokenInfo.exec(req.body.originalDetectIntentRequest.payload.user.idToken);
+          let userInformationJSON = jwt.decode(userInformationIdToken);
           // Return response to user
           return res.json({
-            fulfillmentText: 'Ok'
-            //"email" : userInformationJSON.email,
-            //"completejson" : JSON.stringify(userInformationJSON)
+            fulfillmentText: 'Ok ' + userInformationJSON.email
+            // ,
+            // "completejson" : JSON.stringify(userInformationJSON)
           });
         }
 
