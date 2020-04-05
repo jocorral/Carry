@@ -295,8 +295,8 @@ restService.post("/webhook", function (req, res) {
         return res.json({
           fulfillmentText: 'Please insert a value between 1 and 10, ' + insertedValue + ' is not between those limits.',
           outputContexts : [{
-            name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
-            lifespanCount:5
+            name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateOrder-followup",
+            lifespanCount:2
           }]
         });
       }
