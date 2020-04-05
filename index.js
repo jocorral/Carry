@@ -123,7 +123,7 @@ restService.post("/webhook", function (req, res) {
           let userInformationJSON = jwt.decode(idToken);
           // Return response to user
           return res.json({
-            fulfillmentText: 'Ok ' + JSON.stringify(userInformationJSON)
+            fulfillmentText: 'Ok ' + userInformationJSON.given_name + ' with email ' + userInformationJSON.email
             // + userInformationJSON.email
             // ,
             // "completejson" : JSON.stringify(userInformationJSON)
