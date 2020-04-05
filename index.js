@@ -339,7 +339,7 @@ restService.post("/webhook", function (req, res) {
     //Recover the list of delivered orders from context
     req.body.queryResult.outputContexts.forEach(context =>{
       //Find the correct context
-      if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/setEvaluationValue-followup"){
+      if(context.name == "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/setevaluationvalue-followup"){
         contextMatched = true;
         //Find if the variable exists
         if(context.parameters.evaluationposition){
