@@ -52,7 +52,7 @@ restService.post("/webhook", function (req, res) {
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
-                lifespanCount:4,
+                lifespanCount:5,
                 parameters:{
                   "deliveredorders" : listOfDeliveredOrders
                 }
@@ -60,6 +60,7 @@ restService.post("/webhook", function (req, res) {
             ]
           });
         }
+
         //If contains "to cancel" the context will be of cancelation
         else if(req.body.queryResult.parameters.selectedAction.includes('to cancel')){
           //If an order wants to be cancelled, the context is set to cancelation
@@ -90,10 +91,13 @@ restService.post("/webhook", function (req, res) {
               }
             ]
           });
-        }else if(req.body.queryResult.parameters.selectedAction.includes('to make') ||
-                 req.body.queryResult.parameters.selectedAction.includes('to place') ||
-                 req.body.queryResult.parameters.selectedAction.includes('to order'))
-                 {
+        }
+
+        else if(
+          req.body.queryResult.parameters.selectedAction.includes('to make') ||
+          req.body.queryResult.parameters.selectedAction.includes('to place') ||
+          req.body.queryResult.parameters.selectedAction.includes('to order')
+        ){
           //If an order wants to be cancelled, the context is set to cancelation
           return res.json({
             fulfillmentText: 'Where do you want to make the order and for what time do you want it?',
@@ -104,7 +108,9 @@ restService.post("/webhook", function (req, res) {
               }
             ]
           });
-        }else{
+        }
+        
+        else{
           //In any other case, a help message will be prompted
           return res.json({
             fulfillmentText: 'I\'m sorry, I wasn\'t able to understand what you said, try with something like \"I want to make an order.\", \"I\'d like to evaluate an order.\", or \"I would like to cancel an active order.\".',
@@ -255,7 +261,7 @@ restService.post("/webhook", function (req, res) {
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
-                lifespanCount:4,
+                lifespanCount:5,
                 parameters:{
                   "deliveredorders" : deliveredOrderList
                 }
