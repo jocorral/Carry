@@ -19,22 +19,6 @@ restService.post("/webhook", function (req, res) {
   var speech = '';
 
 
-  
-  if (req.body.queryResult.intent.displayName == 'actions_intent_PERMISSION'){
-    return res.json({
-      fulfillmentText: 'Check what the context contains',
-      outputContexts: [
-        {
-          name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_action_selection",
-          lifespanCount:50,
-          parameters:{
-            "body" : JSON.stringify(req.body)
-          }
-        }
-      ]
-    });
-  }
-
   /* ACTION SELECTION - START */
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
     //To switch between actions, confirm that the query brings parameters
@@ -70,7 +54,8 @@ restService.post("/webhook", function (req, res) {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
                 lifespanCount:5,
                 parameters:{
-                  "deliveredorders" : listOfDeliveredOrders
+                  "deliveredorders" : listOfDeliveredOrders,
+                  "body" : JSON.stringify(req.body)
                 }
               }
             ]
