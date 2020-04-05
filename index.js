@@ -30,11 +30,11 @@ restService.post("/webhook", function (req, res) {
           //If an order wants to be evaluated, the context is set to evaluation
           // TODO Get list of delivered orders
           var listOfDeliveredOrders = [];
-          listOfDeliveredOrders[0] = {"name":"June 23, 2019"};
-          listOfDeliveredOrders[1] = {"name":"June 24, 2019"};
-          listOfDeliveredOrders[2] = {"name":"June 25, 2019"};
-          listOfDeliveredOrders[3] = {"name":"June 26, 2019"};
-          listOfDeliveredOrders[4] = {"name":"June 27, 2019"};
+          listOfDeliveredOrders[0] = {"name":"July 23, 2019"};
+          listOfDeliveredOrders[1] = {"name":"July 24, 2019"};
+          listOfDeliveredOrders[2] = {"name":"July 25, 2019"};
+          listOfDeliveredOrders[3] = {"name":"July 26, 2019"};
+          listOfDeliveredOrders[4] = {"name":"July 27, 2019"};
 
           var listString = '';
           
