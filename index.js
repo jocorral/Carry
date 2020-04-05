@@ -273,11 +273,11 @@ restService.post("/webhook", function (req, res) {
         }else{
           //Return the response to user, adding the parameter to context
           return res.json({
-            fulfillmentText: 'What is the value you want to set? Please, indicate a number between 1 and 10 (decimal values will be discarded)',
+            fulfillmentText: 'What is the value you want to set? please, indicate a number between 1 and 10 (take into consideration that decimal values will be discarded)',
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
-                lifespanCount:14,
+                lifespanCount:13,
                 parameters: {
                   number: number
                 }
@@ -300,7 +300,7 @@ restService.post("/webhook", function (req, res) {
           fulfillmentText: 'Please insert a value between 1 and 10, ' + insertedValue + ' is not between those limits.',
           outputContexts : [{
             name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateOrder-followup",
-            lifespanCount:14
+            lifespanCount:13
           }]
         });
       }
