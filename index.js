@@ -277,7 +277,7 @@ restService.post("/webhook", function (req, res) {
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
-                lifespanCount:15,
+                lifespanCount:14,
                 parameters: {
                   number: number
                 }
@@ -300,7 +300,7 @@ restService.post("/webhook", function (req, res) {
           fulfillmentText: 'Please insert a value between 1 and 10, ' + insertedValue + ' is not between those limits.',
           outputContexts : [{
             name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateOrder-followup",
-            lifespanCount:15
+            lifespanCount:14
           }]
         });
       }
