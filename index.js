@@ -19,6 +19,9 @@ restService.post("/webhook", function (req, res) {
   var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
   var speech = '';
 
+  var idToken = req.body.originalDetectIntentRequest.payload.user.idToken;
+  let userInformationJSON = jwt.decode(idToken);
+
   /* ACTION SELECTION - START */
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
     //To switch between actions, confirm that the query brings parameters
@@ -28,7 +31,7 @@ restService.post("/webhook", function (req, res) {
         //If contains "to evaluate" the context will be of evaluation
         if(req.body.queryResult.parameters.selectedAction.includes('to evaluate')){
           //If an order wants to be evaluated, the context is set to evaluation
-          // TODO Get list of delivered orders
+          // TODO Get list of delivered orders for that user information
           var listOfDeliveredOrders = [];
           listOfDeliveredOrders[0] = {"name":"July 23, 2019"};
           listOfDeliveredOrders[1] = {"name":"July 24, 2019"};
@@ -48,7 +51,7 @@ restService.post("/webhook", function (req, res) {
 
           // Return response to user
           return res.json({
-            fulfillmentText: 'The list of delivered orders is the following: ' + listString + ' which one of them do you want to evaluate?',
+            fulfillmentText: 'Hi ' + userInformationJSON.given_name + ', the list of delivered orders is the following: ' + listString + ' which one of them do you want to evaluate?',
             speech: speech,
             outputContexts: [
               {
@@ -80,7 +83,7 @@ restService.post("/webhook", function (req, res) {
             }
           }
           return res.json({
-            fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
+            fulfillmentText: 'Hi ' + userInformationJSON.given_name + ', the list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
             speech: speech,
             outputContexts: [
               {
@@ -102,7 +105,7 @@ restService.post("/webhook", function (req, res) {
         ){
           //If an order wants to be cancelled, the context is set to cancelation
           return res.json({
-            fulfillmentText: 'Where do you want to make the order and for what time do you want it?',
+            fulfillmentText: 'Hi ' + userInformationJSON.given_name + ', where do you want to make the order and for what time do you want it?',
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_order",
@@ -115,18 +118,9 @@ restService.post("/webhook", function (req, res) {
         //If contains "to test" is because it's being used for testing purposes
         else if(req.body.queryResult.parameters.selectedAction.includes('to test')){
           
-          var idToken = req.body.originalDetectIntentRequest.payload.user.idToken;
-          // var regExToGetIdTokenInfo = new RegExp('(?<=\.)(.*)(?=\.)');
-          // let userInformationIdToken = regExToGetIdTokenInfo.exec(idToken);
-          // console.log('token user ' + userInformationIdToken[0]);
-          // let userInformationJSON = jwt.decode(userInformationIdToken[0]);
-          let userInformationJSON = jwt.decode(idToken);
           // Return response to user
           return res.json({
             fulfillmentText: 'Ok ' + userInformationJSON.given_name + ' with email ' + userInformationJSON.email
-            // + userInformationJSON.email
-            // ,
-            // "completejson" : JSON.stringify(userInformationJSON)
           });
         }
 
