@@ -115,10 +115,12 @@ restService.post("/webhook", function (req, res) {
         //If contains "to test" is because it's being used for testing purposes
         else if(req.body.queryResult.parameters.selectedAction.includes('to test')){
           
-          var regExToGetIdTokenInfo = new RegExp('(?<=\.)(.*)(?=\.)');
-          let userInformationIdToken = regExToGetIdTokenInfo.exec(idToken);
-          console.log('token user ' + userInformationIdToken[0]);
-          let userInformationJSON = jwt.decode(userInformationIdToken[0]);
+          var idToken = req.body.originalDetectIntentRequest.payload.user.idToken;
+          // var regExToGetIdTokenInfo = new RegExp('(?<=\.)(.*)(?=\.)');
+          // let userInformationIdToken = regExToGetIdTokenInfo.exec(idToken);
+          // console.log('token user ' + userInformationIdToken[0]);
+          // let userInformationJSON = jwt.decode(userInformationIdToken[0]);
+          let userInformationJSON = jwt.decode(idToken);
           // Return response to user
           return res.json({
             fulfillmentText: 'Ok ' + JSON.stringify(userInformationJSON)
