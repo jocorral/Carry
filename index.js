@@ -271,7 +271,7 @@ restService.post("/webhook", function (req, res) {
         }else{
           //Return the response to user, adding the parameter to context
           return res.json({
-            fulfillmentText: 'What is the value you want to set? (Please, indicate a value between 1 and 10), selected number was ' + number,
+            fulfillmentText: 'What is the value you want to set? Please, indicate a number between 1 and 10 (decimal values will be discarded)',
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
@@ -283,6 +283,22 @@ restService.post("/webhook", function (req, res) {
             ]
           });
         }
+      }
+    }
+  }
+  else if (req.body.queryResult.intent.displayName == 'setEvaluationValue'){
+    let insertedValue = 0;
+    //Check if inserted value is not between 1 and 10
+    if(req.body.queryResult.parameters.value){
+      insertedValue = parseInt(req.body.queryResult.parameters.value);
+      if(insertedValue < 1 || insertedValue > 10){
+        return res.json({
+          fulfillmentText: 'Please insert a value between 1 and 10, ' + insertedValue + ' is not between those limits.',
+          outputContexts : [{
+            name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
+            lifespanCount:5
+          }]
+        });
       }
     }
   }
