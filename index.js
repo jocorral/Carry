@@ -261,6 +261,7 @@ restService.post("/webhook", function (req, res) {
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
+                lifespanCount:1,
                 parameters: {
                   number: number
                 }
