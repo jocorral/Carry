@@ -137,7 +137,7 @@ restService.post("/webhook", function (req, res) {
 
     if(!contextMatched){
       return res.json({
-        fulfillmentText: 'Some error with the database took place, please try again.'
+        fulfillmentText: 'Some error with the context names took place, please try again.'
       });
     }
 
@@ -215,6 +215,65 @@ restService.post("/webhook", function (req, res) {
     }
 
   }
+  else if (req.body.queryResult.intent.displayName == 'evaluateOrder'){
+    var contextMatched = false;
+    var deliveredOrderList;
+    //Recover the list of delivered orders from context
+    req.body.queryResult.outputContexts.forEach(context =>{
+      //Find the correct context
+      if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation"){
+        contextMatched = true;
+        //Find if the variable exists
+        if(context.parameters.deliveredorders){
+          //Assign variable to the delivered order list
+          deliveredOrderList = context.parameters.deliveredorders;
+        }
+      }
+    });
+
+    //If context wasn't found, send a message to user
+    if(!contextMatched){
+      return res.json({
+        fulfillmentText: 'Some error with the context names took place, please try again.'
+      });
+    }
+    //Check if it contains parameters
+    if (req.body.queryResult && req.body.queryResult.parameters) {
+      //Number parameter must exist
+      if (req.body.queryResult.parameters.number) {
+        let number = req.body.queryResult.parameters.number;
+        //If the inserted number is bigger than the deliver order list length, don't allow it
+        if(number > deliveredOrderList.length){
+          //Return error response to the user
+          return res.json({
+            fulfillmentText: 'The specified number must be smaller than the list lenght, please say a number between 1 and '+ deliveredOrderList.length,
+            outputContexts: [
+              {
+                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
+                lifespanCount:4
+              }
+            ]
+          });
+        }else{
+          //Return the response to user, adding the parameter to context
+          return res.json({
+            fulfillmentText: 'What is the value you want to set? (Please, indicate a value between 1 and 10), selected arraypos was ' + number,
+            outputContexts: [
+              {
+                name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
+                lifespanCount:2,
+                parameters: {
+                  number: number
+                }
+              }
+            ]
+          });
+        }
+      }
+    }
+  }
+
+
   else if (req.body.queryResult.intent.displayName == 'order') {
     if (req.body.queryResult && req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
