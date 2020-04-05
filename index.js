@@ -27,6 +27,7 @@ restService.post("/webhook", function (req, res) {
       if (req.body.queryResult.parameters.selectedAction) {
         //If contains "to evaluate" the context will be of evaluation
         if(req.body.queryResult.parameters.selectedAction.includes('to evaluate')){
+          console.log('Evaluation selected as action');
           //If an order wants to be evaluated, the context is set to evaluation
           // TODO Get list of delivered orders
           var listOfDeliveredOrders = [];
@@ -129,6 +130,7 @@ restService.post("/webhook", function (req, res) {
 
 
   else if (req.body.queryResult.intent.displayName == 'cancelOrder'){
+    console.log('Order cancelation selected, output context are the following ' + JSON.stringify(req.body.queryResult.outputContexts));
     var contextMatched = false;
     var activeOrdersList;
     //Recover the list of active orders from context
