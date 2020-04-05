@@ -178,7 +178,7 @@ restService.post("/webhook", function (req, res) {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/cancelorder-followup",
                 lifespanCount:2,
                 parameters: {
-                  number: number
+                  "number": number
                 }
               }
             ]
@@ -279,7 +279,7 @@ restService.post("/webhook", function (req, res) {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
                 lifespanCount:2,
                 parameters: {
-                  number: number
+                  "number": number
                 }
               }
             ]
@@ -291,7 +291,16 @@ restService.post("/webhook", function (req, res) {
   else if (req.body.queryResult.intent.displayName == 'setEvaluationValue'){
     console.log('Evaluation value is being set');
     let insertedValue = 0;
-    let selectedPosition = 0;
+    let selectedPosition;
+    
+    req.body.queryResult.outputContexts.forEach(context => {
+      if(context.name == "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateOrder-followup"){
+        if(context.parameters && context.parameters.number){
+          selectedPosition = number;
+        }
+      }
+    });
+
     //Check if inserted value is not between 1 and 10
     if(req.body.queryResult.parameters.value){
       insertedValue = parseInt(req.body.queryResult.parameters.value);
@@ -300,18 +309,14 @@ restService.post("/webhook", function (req, res) {
           fulfillmentText: 'Please insert a value between 1 and 10, ' + insertedValue + ' is not between those limits.',
           outputContexts : [{
             name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateOrder-followup",
-            lifespanCount:2
+            lifespanCount:2,
+            parameters: {
+              "number": selectedPosition
+            }
           }]
         });
       }
       else{
-        req.body.queryResult.outputContexts.forEach(context => {
-          if(context.name == "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateOrder-followup"){
-            if(context.parameters && context.parameters.number){
-              selectedPosition = number;
-            }
-          }
-        });
         return res.json({
           fulfillmentText: 'You want to set a value of '+ insertedValue+ ' in the position number ' + selectedPosition + ', is that right?',
           outputContexts : [{
@@ -319,7 +324,9 @@ restService.post("/webhook", function (req, res) {
             lifespanCount:2,
             parameters:[
               {
-                "evaluationposition" : selectedPosition,
+                "evaluationposition" : selectedPosition
+              },
+              {
                 "evaluationvalue" : insertedValue
               }
             ]
