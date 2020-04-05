@@ -273,7 +273,7 @@ restService.post("/webhook", function (req, res) {
         }else{
           //Return the response to user, adding the parameter to context
           return res.json({
-            fulfillmentText: 'What is the value you want to set? please, indicate a number between 1 and 10 (take into consideration that decimal values will be discarded)',
+            fulfillmentText: 'What is the value you want to set? Indicate a number between 1 and 10, please. Take into consideration that decimal values will be discarded.',
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
