@@ -257,11 +257,10 @@ restService.post("/webhook", function (req, res) {
         }else{
           //Return the response to user, adding the parameter to context
           return res.json({
-            fulfillmentText: 'What is the value you want to set? (Please, indicate a value between 1 and 10), selected arraypos was ' + number,
+            fulfillmentText: 'What is the value you want to set? (Please, indicate a value between 1 and 10), selected number was ' + number,
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/evaluateorder-followup",
-                lifespanCount:2,
                 parameters: {
                   number: number
                 }
