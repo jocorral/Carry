@@ -116,8 +116,8 @@ restService.post("/webhook", function (req, res) {
         }
         
         else if(req.body.queryResult.parameters.selectedAction.includes('to test')){
-          let userInformationIdToken = regExToGetIdTokenInfo.exec(req.body.originalDetectIntentRequest.payload.user.idToken);
-          let userInformationJSON = jwt.decode(userInformationIdToken);
+          //let userInformationIdToken = regExToGetIdTokenInfo.exec(req.body.originalDetectIntentRequest.payload.user.idToken);
+          //let userInformationJSON = jwt.decode(userInformationIdToken);
           // Return response to user
           return res.json({
             fulfillmentText: 'Ok'
