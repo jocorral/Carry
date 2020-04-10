@@ -612,7 +612,7 @@ restService.post("/webhook", function (req, res) {
       }
     });
 
-    if(contextMatched){
+    /*if(contextMatched){
       //More items wan to be added
       if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
         
@@ -680,7 +680,11 @@ restService.post("/webhook", function (req, res) {
         });
       }
       
-    }
+    }*/
+    return res.json({
+      fulfillmentText: 'Context matched? ' + contextMatched + ' The order in ' + restaurant + ' at ' + time + ' on ' + date + ' has the following items so far: ' +
+      JSON.stringify(selectedItemList) + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString
+    });
   }
 
   else if (req.body.queryResult.intent.displayName == 'pay') {
