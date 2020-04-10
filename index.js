@@ -473,12 +473,25 @@ restService.post("/webhook", function (req, res) {
           fulfillmentText: 'An error took place trying to select an specific item by the words ' + wordList
         });
       } else {
+        
+        //Recover the list of previously selected items and push this item to the list
+        
         let specifiedAmount = 1;
         if (req.body.queryResult.parameters.amount) {
           specifiedAmount = req.body.queryResult.parameters.amount;
         }
+        
         return res.json({
           fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?'
+          // outputContexts : [
+          //   {
+          //     name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_confirmation",
+          //     lifespanCount: 5,
+          //     parameters: {
+          //       "selectedItems" : selectedItems
+          //     }
+          //   }
+          // ]
         });
       }
     }
