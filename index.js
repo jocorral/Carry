@@ -466,14 +466,14 @@ restService.post("/webhook", function (req, res) {
         }
       });
 
-      if (selectedItem === null) {
+      /*if (selectedItem === null) {
         //Launch error
         return res.json({
           fulfillmentText: 'An error took place trying to select an specific item by the words ' + wordList
         });
       } else {
         
-        //Recover the list of previously selected items and push this item to the list
+        // TODO Recover the list of previously selected items and push this item to the list
         
         let specifiedAmount = 1;
         if (req.body.queryResult.parameters.amount) {
@@ -492,7 +492,10 @@ restService.post("/webhook", function (req, res) {
           //   }
           // ]
         });
-      }
+      }*/
+      return res.json({
+        fulfillmentText: 'You\'ve selected ' + selectedItem.name + ' the selected amount is in parameters ' + JSON.stringify(req.body.queryResult.parameters)
+      });
     }
   }
   else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
