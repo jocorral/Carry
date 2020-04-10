@@ -640,8 +640,8 @@ restService.post("/webhook", function (req, res) {
     }
     else{
       return res.json({
-        fulfillmentText: 'Variables (supposedly with values) res ' + restaurant + ' selectedIt '+ selectedItemList.length + ' date ' + date +
-        ' time '+ time + ' available ' +availableItems.length
+        fulfillmentText: 'Variables (supposedly with values) res ' + restaurant + ' selectedIt '+ JSON.stringify(selectedItemList) + ' date ' + date +
+        ' time '+ time + ' available ' +JSON.stringify(availableItems)
       });
     }
 
