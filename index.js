@@ -430,8 +430,8 @@ restService.post("/webhook", function (req, res) {
           lifespanCount:5,
           parameters:{
             "restaurant" : restaurant,
-            "date" : date,
-            "time" : time,
+            // "date" : date,
+            // "time" : time,
             "availableItems" : listOfAvailableItems
           }
         }
