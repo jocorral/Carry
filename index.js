@@ -522,7 +522,7 @@ restService.post("/webhook", function (req, res) {
       }*/
       return res.json({
         fulfillmentText: //'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?'
-        'The specified dish was ' + JSON.stringify(wordList);
+        'The specified dish was ' + JSON.stringify(wordList)
         // outputContexts : [
         //   {
         //     name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_confirmation",
