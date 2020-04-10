@@ -413,16 +413,16 @@ restService.post("/webhook", function (req, res) {
     }
 
     //Adapt time variable to show only the necesary information
-    var regExTime = /(?<=T)(.*?)(?=\+)/g;
-    var regExDate = /(.*?)(?=T)/g;
-    let time = regExTime.exec(datetime);
-    let timeWithoutSeconds = time.substring(0, time.length - 2);
-    let date = regExDate.exec(datetime);
+    // var regExTime = /(?<=T)(.*?)(?=\+)/g;
+    // var regExDate = /(.*?)(?=T)/g;
+    // let time = regExTime.exec(datetime);
+    // let timeWithoutSeconds = time.substring(0, time.length - 2);
+    // let date = regExDate.exec(datetime);
 
 
     // Return response to user
     return res.json({
-      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + timeWithoutSeconds + '.\n'+
+      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + datetime + '.\n'+ // + date + ' at ' + timeWithoutSeconds
       'This restaurant contains the following available items ' + listOfAvailableItemsString + '.',
       outputContexts: [
         {
