@@ -648,10 +648,15 @@ restService.post("/webhook", function (req, res) {
           }
         }
 
+        let selectedItemListStr = '';
+        for(let i = 0; i < selectedItemList.length; i++){
+          selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name;
+        }
+
         //Return to previous context with the restaurant related + datetime related + selected items info
         return res.json({
           fulfillmentText: 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items so far: ' +
-          JSON.stringify(selectedItemList) + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString,
+          selectedItemListStr + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString,
           outputContexts: [
             {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
@@ -672,14 +677,16 @@ restService.post("/webhook", function (req, res) {
       else{
         let response;
         let totalCost = 0;
+        let selectedItemListStr = '';
         //If no item was selected, the order can not be placed
         if (selectedItemList.length !== 0) {
           //Calculate total cost
           for (let i = 0; i < selectedItemList.length; i++) {
             totalCost = totalCost + selectedItemList[i].price;
+            selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name;
           }
           response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: ' +
-          JSON.stringify(selectedItemList) + '. The total cost of this operation is ' + totalCost + ' This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
+          selectedItemListStr + '. The total cost of this operation is ' + totalCost + ' This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
           'Card number, the month when the validity of the card ends and the CVC code (which you can find behind your card).'
         }else{
           response = 'No item was selected, no order can be placed.';
