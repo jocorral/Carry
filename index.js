@@ -459,7 +459,8 @@ restService.post("/webhook", function (req, res) {
       let wordList = req.body.queryResult.parameters.dish[0].split(" ");
       //Check if the selected items are between the available options
       //For that, iterate all the items in itemList
-      let selectedItem = null;
+
+      /*let selectedItem = null;
       listOfAvailableItems.forEach(item => {
         //If a wordlist includes all the idwords of this specific item, return the item, if not, return null
         if (item.idwords.every(word => wordList.includes(word))) {
@@ -493,11 +494,11 @@ restService.post("/webhook", function (req, res) {
           //   }
           // ]
         });
-      }
+      }*/
     }
-    // return res.json({
-    //   fulfillmentText: 'List items ' + JSON.stringify(itemList) + ' parameters ' + JSON.stringify(req.body.queryResult.parameters)
-    // });
+    return res.json({
+      fulfillmentText: 'List items ' + JSON.stringify(itemList) + ' parameters ' + JSON.stringify(wordList)
+    });
   }
   else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
     var order = '';
