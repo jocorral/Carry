@@ -546,7 +546,7 @@ restService.post("/webhook", function (req, res) {
         selectedItemList.push({"amount" : specifiedAmount, "name": selectedItem.name, "price": selectedItem.price});
         
         return res.json({
-          fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?',
+          fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', would you like to add any other item to this order?',
           outputContexts : [
             {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup",
@@ -641,7 +641,7 @@ restService.post("/webhook", function (req, res) {
     }
   }
   else if (req.body.queryResult.intent.displayName == 'moreItemsNo') {
-
+    
   }
 
 
