@@ -3,6 +3,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const jwt = require('jsonwebtoken');
+var converter = require('number-to-words');
 
 const restService = express();
 
@@ -403,7 +404,7 @@ restService.post("/webhook", function (req, res) {
     var listOfAvailableItems = [];
     listOfAvailableItems[0] = { "name": "Chocolate cookie", "price": 3, "idwords": ["chocolate", "cookie"] };
     listOfAvailableItems[1] = { "name": "Pizza Margarita (large)", "price": 19.5, "idwords": ["large", "margarita"] };
-    listOfAvailableItems[2] = { "name": "4 cheese pizza (medium)", "price": 12, "idwords": ["cheese", "4", "medium"] };
+    listOfAvailableItems[2] = { "name": "4 cheese pizza (medium)", "price": 12, "idwords": ["cheese", "four", "medium"] };
     listOfAvailableItems[3] = { "name": "Coca cola (medium)", "price": 2.5, "idwords": ["cola", "medium", "coca"] };
     listOfAvailableItems[4] = { "name": "Meatball pizza (medium)", "price": 15, "idwords": ["pizza", "meatball", "medium"] };
     if (listOfAvailableItems.length !== 0) {
@@ -457,6 +458,8 @@ restService.post("/webhook", function (req, res) {
       //Create a list of the said words
       let wordList = req.body.queryResult.parameters.dish[0].split(" ");
 
+      //Subtitute numbers by words
+
       //Clean list of plurals
       const endings = {
         ves: 'fe',
@@ -477,15 +480,21 @@ restService.post("/webhook", function (req, res) {
             wordList[i] = 'smoothie';
           }
           else{
-            wordList[i] = wordList[i].replace(
-            new RegExp(`(${Object.keys(endings).join('|')})$`),
-            r => endings[r]);   
+            //If it's a number, transform it into a word
+            if(!isNaN(wordList[i])){
+              let num = parseInt(wordList[i]);
+              wordList[i] = converter.toWords(num).toLowerCase();
+            }else{
+              wordList[i] = wordList[i].replace(
+              new RegExp(`(${Object.keys(endings).join('|')})$`),
+              r => endings[r]).toLowerCase();
+            }
           }
       }
 
       //Check if the selected items are between the available options
       //For that, iterate all the items in itemList
-      let selectedItem = null;
+      /*let selectedItem = null;
       itemList.forEach(item => {
         //If a wordlist includes all the idwords of this specific item, return the item, if not, return null
         if (item.idwords.every(word => wordList.includes(word))) {
@@ -509,19 +518,21 @@ restService.post("/webhook", function (req, res) {
           specifiedAmount = req.body.queryResult.parameters.amount;
         }
 
-        return res.json({
-          fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?'
-          // outputContexts : [
-          //   {
-          //     name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_confirmation",
-          //     lifespanCount: 5,
-          //     parameters: {
-          //       "selectedItems" : selectedItems
-          //     }
-          //   }
-          // ]
-        });
-      }
+        
+      }*/
+      return res.json({
+        fulfillmentText: //'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?'
+        'The specified dish was ' + JSON.stringify(wordList);
+        // outputContexts : [
+        //   {
+        //     name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_confirmation",
+        //     lifespanCount: 5,
+        //     parameters: {
+        //       "selectedItems" : selectedItems
+        //     }
+        //   }
+        // ]
+      });
     }
   }
   else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
