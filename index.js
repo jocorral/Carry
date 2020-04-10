@@ -23,7 +23,7 @@ restService.post("/webhook", function (req, res) {
   let userInformationJSON = jwt.decode(idToken);
 
   /* DEFAULT WELCOME - START */
-  if (req.body.queryResult.intent.displayName == 'actionSelection'){
+  if (req.body.queryResult.intent.displayName == 'defaultWelcome'){
     return res.json({
       fulfillmentText: 'Hello ' + userInformationJSON.given_name + '! I\'m Carry, what can I help you in today?'
     });
@@ -31,7 +31,7 @@ restService.post("/webhook", function (req, res) {
   /* DEFAULT WELCOME - END */
 
   /* ACTION SELECTION - START */
-  if (req.body.queryResult.intent.displayName == 'actionSelection'){
+  else if (req.body.queryResult.intent.displayName == 'actionSelection'){
     //To switch between actions, confirm that the query brings parameters
     if (req.body.queryResult && req.body.queryResult.parameters) {
       //Confirm that variable selectedAction exists
