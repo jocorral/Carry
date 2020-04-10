@@ -633,7 +633,7 @@ restService.post("/webhook", function (req, res) {
     //If context wasn't found, send a message to user
     if (!contextMatched) {
       return res.json({
-        fulfillmentText: 'Some error with the context names took place, please try again. contexts ' +JSON.stringify(req.body.queryResult.outputContexts)
+        fulfillmentText: 'Con ' +JSON.stringify(req.body.queryResult.outputContexts)
       });
     }
 
