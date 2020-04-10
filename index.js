@@ -596,7 +596,7 @@ restService.post("/webhook", function (req, res) {
     //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context => {
       //The context of order items followup will contain selected Items
-      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderitems-followup") {
+      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup") {
         contextMatched = true;
         // Recover the list of previously selected items and push this item to the list
         if(context.parameters.selectedItems){
@@ -633,8 +633,7 @@ restService.post("/webhook", function (req, res) {
     //If context wasn't found, send a message to user
     if (!contextMatched) {
       return res.json({
-        fulfillmentText: 'Some error with the context names took place, please try again. restaurant ' +JSON.stringify(restaurant)+ ' selected item ' +JSON.stringify(selectedItemList)+
-        + ' date ' +JSON.stringify(date)+ ' date ' +JSON.stringify(time)+ ' available items '+ JSON.stringify(listOfAvailableItems)
+        fulfillmentText: 'Some error with the context names took place, please try again. contexts ' +JSON.stringify(req.body.queryResult.outputContexts)
       });
     }
 
@@ -706,11 +705,7 @@ restService.post("/webhook", function (req, res) {
       }
       
     }
-    /*return res.json({
-      fulfillmentText: 'Zimbaweeeee'
-      //  'Context matched? ' + contextMatched + ' The order in ' + restaurant + ' at ' + time + ' on ' + date + ' has the following items so far: ' +
-      // JSON.stringify(selectedItemList) + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString
-    });*/
+    
   }
   /* ORDER RELATED ACTIONS - END */
 
