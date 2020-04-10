@@ -588,11 +588,11 @@ restService.post("/webhook", function (req, res) {
 
   else if (req.body.queryResult.intent.displayName == 'moreItemsYes' || req.body.queryResult.intent.displayName == 'moreItemsNo') {
     var contextMatched = false;
-    let listOfAvailableItems;
-    let selectedItemList = [];
-    let restaurant;
-    let date;
-    let time;
+    let availableItems;
+    let selectedItemListF = [];
+    let selectedRestaurant;
+    let specifiedDate;
+    let specifiedTime;
     var relevantContext;
     //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context => {
@@ -603,13 +603,13 @@ restService.post("/webhook", function (req, res) {
         // Recover the list of previously selected items and push this item to the list
         if(context.parameters.selectedItems){
           //Get all the previously selected items in a variable
-          selectedItemList = context.parameters.selectedItems;
+          selectedItemListF = context.parameters.selectedItems;
         }
         
         //Find if the availableItems exists
         if (context.parameters.availableItems) {
           //Assign variable to the active order list
-          listOfAvailableItems = context.parameters.availableItems;
+          availableItems = context.parameters.availableItems;
         }
 
         //Find if the restaurant exists
@@ -640,8 +640,8 @@ restService.post("/webhook", function (req, res) {
     }
     else{
       return res.json({
-        fulfillmentText: 'Variables (supposedly with values) res ' + restaurant + ' selectedIt '+ JSON.stringify(selectedItemList) + ' date ' + date +
-        ' time '+ time + ' available ' +JSON.stringify(availableItems)
+        fulfillmentText: 'Variables (supposedly with values) res ' + selectedRestaurant + ' selectedIt '+ JSON.stringify(selectedItemListF) + ' date ' + specifiedDate +
+        ' time '+ specifiedTime + ' available ' +JSON.stringify(availableItems)
       });
     }
 
