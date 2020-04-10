@@ -494,7 +494,7 @@ restService.post("/webhook", function (req, res) {
 
       //Check if the selected items are between the available options
       //For that, iterate all the items in itemList
-      /*let selectedItem = null;
+      let selectedItem = null;
       itemList.forEach(item => {
         //If a wordlist includes all the idwords of this specific item, return the item, if not, return null
         if (item.idwords.every(word => wordList.includes(word))) {
@@ -519,20 +519,21 @@ restService.post("/webhook", function (req, res) {
         }
 
         
-      }*/
-      return res.json({
-        fulfillmentText: //'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?'
-        'The specified dish was ' + JSON.stringify(wordList)
-        // outputContexts : [
-        //   {
-        //     name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_confirmation",
-        //     lifespanCount: 5,
-        //     parameters: {
-        //       "selectedItems" : selectedItems
-        //     }
-        //   }
-        // ]
-      });
+        return res.json({
+          fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?'
+          
+          // outputContexts : [
+          //   {
+          //     name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_confirmation",
+          //     lifespanCount: 5,
+          //     parameters: {
+          //       "selectedItems" : selectedItems
+          //     }
+          //   }
+          // ]
+        });
+
+      }
     }
   }
   else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
