@@ -25,7 +25,7 @@ restService.post("/webhook", function (req, res) {
   /* DEFAULT WELCOME - START */
   if (req.body.queryResult.intent.displayName == 'defaultWelcome'){
     return res.json({
-      fulfillmentText: 'Hello ' + JSON.stringify(userInformationJSON) + '! I\'m Carry, what can I help you in today?'
+      fulfillmentText: 'Hello ' + userInformationJSON.given_name + '! I\'m Carry, what can I help you in today?'
     });
   }
   /* DEFAULT WELCOME - END */
@@ -422,7 +422,7 @@ restService.post("/webhook", function (req, res) {
 
     // Return response to user
     return res.json({
-      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + timeWothoutSeconds + '.\n'+
+      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n'+
       'This restaurant contains the following available items ' + listOfAvailableItemsString + '.',
       outputContexts: [
         {
@@ -430,7 +430,7 @@ restService.post("/webhook", function (req, res) {
           lifespanCount:5,
           parameters:{
             "restaurant" : restaurant,
-            "date" : ,
+            "date" : date,
             "time" : time,
             "availableItems" : listOfAvailableItems
           }
