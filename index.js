@@ -455,7 +455,7 @@ restService.post("/webhook", function (req, res) {
       }
     });
 
-    if (req.body.queryResult.parameters && req.body.queryResult.parameters.dish) {
+    /*if (req.body.queryResult.parameters && req.body.queryResult.parameters.dish) {
       let wordList = req.body.queryResult.parameters.dish.split(" ");
       //Check if the selected items are between the available options
       //For that, iterate all the items in itemList
@@ -494,20 +494,10 @@ restService.post("/webhook", function (req, res) {
           // ]
         });
       }
-    }
-
-
-
-    // if (req.body.queryResult && req.body.queryResult.parameters) {
-    //   if (req.body.queryResult.parameters.dish && req.body.queryResult.parameters.amount) {
-    //     speech = req.body.queryResult.parameters.amount !== 1 ?
-    //       req.body.queryResult.parameters.amount + ' ' + req.body.queryResult.parameters.dish + 's, is this everything that you want to order?' :
-    //       req.body.queryResult.parameters.amount + ' ' + req.body.queryResult.parameters.dish + ', is this everything that you want to order?';
-    //   } else {
-    //     speech = req.body.queryResult.parameters.dish ? req.body.queryResult.parameters.dish + ', is this everything that you want to order?' : "Something didn't go as planned, please repeat your request"
-    //   }
-    // }
-
+    }*/
+    return res.json({
+      fulfillmentText: 'List items ' + JSON.stringify(itemList) + ' parameters ' + JSON.stringify(req.body.queryResult.parameters)
+    });
   }
   else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
     var order = '';
