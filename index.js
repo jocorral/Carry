@@ -387,14 +387,14 @@ restService.post("/webhook", function (req, res) {
 
   /* ORDER RELATED ACTIONS - START */
   else if (req.body.queryResult.intent.displayName == 'placeOrder') {
-    let time;
+    let datetime;
     let restaurant;
     //Select a restaurant and a time for the order to be received
     if(req.body.queryResult.parameters && req.body.queryResult.parameters.restaurant){
       restaurant = req.body.queryResult.parameters.restaurant;
     }
     if(req.body.queryResult.parameters && req.body.queryResult.parameters.time){
-      time = req.body.queryResult.parameters.time;
+      datetime = req.body.queryResult.parameters.time;
     }
 
     var listOfAvailableItemsString = '';
@@ -412,9 +412,17 @@ restService.post("/webhook", function (req, res) {
       }
     }
 
+    //Adapt time variable to show only the necesary information
+    var regExTime = '(?<=T)(.*?)(?=\+)';
+    var regExDate = '(.*?)(?=T)';
+    let time = regExTime.exec(datetime);
+    let timeWothoutSeconds = time.substring(0, time.length - 2);
+    let date = regExDate.exec(datetime);
+
+
     // Return response to user
     return res.json({
-      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + time + '.\n'+
+      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + timeWothoutSeconds + '.\n'+
       'This restaurant contains the following available items ' + listOfAvailableItemsString + '.',
       outputContexts: [
         {
@@ -422,6 +430,7 @@ restService.post("/webhook", function (req, res) {
           lifespanCount:5,
           parameters:{
             "restaurant" : restaurant,
+            "date" : ,
             "time" : time,
             "availableItems" : listOfAvailableItems
           }
