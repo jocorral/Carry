@@ -427,7 +427,7 @@ restService.post("/webhook", function (req, res) {
       outputContexts: [
         {
           name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
-          lifespanCount: 5,
+          lifespanCount: 7,
           parameters: {
             "restaurant": restaurant,
             "date": date,
@@ -441,6 +441,7 @@ restService.post("/webhook", function (req, res) {
   else if (req.body.queryResult.intent.displayName == 'orderItems') {
     var contextMatched = false;
     var itemList;
+    var selectedItemList = [];
     //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context => {
       //Find the correct context
@@ -451,14 +452,18 @@ restService.post("/webhook", function (req, res) {
           //Assign variable to the active order list
           itemList = context.parameters.availableItems;
         }
+
+        // Recover the list of previously selected items and push this item to the list
+        if(context.parameters.selectedItems){
+          //Get all the previously selected items in a variable
+          selectedItemList = context.parameters.selectedItems;
+        }
       }
     });
 
     if (req.body.queryResult.parameters && req.body.queryResult.parameters.dish) {
       //Create a list of the said words
       let wordList = req.body.queryResult.parameters.dish[0].split(" ");
-
-      //Subtitute numbers by words
 
       //Clean list of plurals
       const endings = {
@@ -502,57 +507,144 @@ restService.post("/webhook", function (req, res) {
         }
       });
 
-      let itemString = JSON.stringify(selectedItem);
+      let response;
 
+      //If an item was not selected
       if (selectedItem === null) {
-        //Launch error
+        //Launch error but allow the selection to still be made
+        response = 'An error took place trying to get the indicated item, currently the selected items are the following: ';
+
+        if(selectedItemList.length === 0){
+          response += 'No item has been selected yet.';
+        }else{
+          for(let j = 0; j<selectedItemList.length; j++){
+            response = response + selectedItemList[j].amount + ' - ' + selectedItemList[j].name;
+          }
+        }
+
+        //Return response to user
         return res.json({
-          fulfillmentText: 'An error took place trying to select an specific item by the words ' + wordList
+          fulfillmentText: response,
+          outputContexts : [
+            {
+              name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup",
+              lifespanCount: 2,
+              parameters: {
+                "selectedItems" : selectedItemList
+              }
+            }
+          ]
         });
+
       } else {
-
-        // TODO Recover the list of previously selected items and push this item to the list
-
+        //If an item was selected, get specified amount
         let specifiedAmount = 1;
         if (req.body.queryResult.parameters.amount) {
           specifiedAmount = req.body.queryResult.parameters.amount;
         }
 
+        selectedItemList.push({"amount" : specifiedAmount, "name": selectedItem.name, "price": selectedItem.price});
         
         return res.json({
-          fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?'
-          
-          // outputContexts : [
-          //   {
-          //     name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_confirmation",
-          //     lifespanCount: 5,
-          //     parameters: {
-          //       "selectedItems" : selectedItems
-          //     }
-          //   }
-          // ]
+          fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?',
+          outputContexts : [
+            {
+              name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup",
+              lifespanCount: 2,
+              parameters: {
+                "selectedItems" : selectedItemList
+              }
+            }
+          ]
         });
 
       }
     }
   }
-  else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
-    var order = '';
-    var totalCost = 0;
-    if (req.body.queryResult && req.body.queryResult.parameters) {
-      speech = req.body.queryResult.parameters.response == 'Yes' ? 'Alright! The total cost of your order is ' + totalCost + '€. Would you like to pay it now or pay it on your arrival?' : 'Sure, let\'s make the order again.';
-      // Calculate payment
-    }
+  else if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
+    var contextMatched = true;
+    var itemList;
+    var selectedItemList = [];
+    var restaurant;
+    var date;
+    var time;
+    //Recover the list of active orders from context
+    req.body.queryResult.outputContexts.forEach(context => {
+      //The context of order items followup will contain selected Items
+      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup") {
+        // Recover the list of previously selected items and push this item to the list
+        if(context.parameters.selectedItems){
+          //Get all the previously selected items in a variable
+          selectedItemList = context.parameters.selectedItems;
+        }
+      }else{
+        contextMatched = false;
+      }
+      
+      //The context of order placed will contain restaurant related information and date/time info.
+      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed") {
+        contextMatched = true;
+        //Find if the availableItems exists
+        if (context.parameters.availableItems) {
+          //Assign variable to the active order list
+          itemList = context.parameters.availableItems;
+        }
 
+        //Find if the restaurant exists
+        if (context.parameters.restaurant) {
+          //Assign variable to the active order list
+          restaurant = context.parameters.restaurant;
+        }
 
-    return res.json({
-      //data: speechResponse,
-      fulfillmentText: speech,
-      speech: speech,
-      displayText: speech,
-      source: "webhook-echo-sample"
+        //Find if the date exists
+        if (context.parameters.date) {
+          //Assign variable to the active order list
+          date = context.parameters.date;
+        }
+
+        //Find if the time exists
+        if (context.parameters.time) {
+          //Assign variable to the active order list
+          time = context.parameters.time;
+        }
+      }else{
+        contextMatched = false;
+      }
     });
+
+    if(contextMatched){
+      let listOfAvailableItemsString = '';
+      if (listOfAvailableItems.length !== 0) {
+        for (let i = 0; i < listOfAvailableItems.length; i++) {
+          listOfAvailableItemsString = listOfAvailableItemsString + (i + 1) + ' - ' + listOfAvailableItems[i].name + '\n';
+        }
+      }
+
+      //Return to previous context with the restaurant related + datetime related + selected items info
+      return res.json({
+        fulfillmentText: 'The order in ' + restaurant + ' at ' + time + ' on ' + date + ' has the following items so far: ' +
+        JSON.stringify(selectedItemList) + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString,
+        outputContexts: [
+          {
+            name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
+            lifespanCount: 7,
+            parameters: {
+              "restaurant": restaurant,
+              "date": date,
+              "time": timeWithoutSeconds,
+              "availableItems": listOfAvailableItems,
+              "selectedItems": selectedItemList
+            }
+          }
+        ]
+      });
+    }
   }
+  else if (req.body.queryResult.intent.displayName == 'moreItemsNo') {
+
+  }
+
+
   else if (req.body.queryResult.intent.displayName == 'paymentMethod') {
     var totalCost = 0;
     //This variable indicates whether the user wants to pay the order by credit card or manually
@@ -646,33 +738,4 @@ restService.listen(process.env.PORT || 8000, function () {
   }
 }*/
 
-/*restService.post("/pedido", (request, response) => {
-    var response = request.body.queryResult &&
-        request.body.queryResult.parameters &&
-        request.body.queryResult.parameters.echoText
-        ? request.body.queryResult.parameters.echoText
-        : "Seems like some problem. Speak again.";
-
-    var speechResponse = {
-        google: {
-            expectUserResponse: true,
-            richResponse = {
-                items: [{
-                    simpleResponse: {
-                        textToSpeech: response
-                    }
-                }]
-            }
-        }
-    };
-
-    return response.json({
-        payload: speechResponse,
-        //data: ,
-        fulfillmentText: "Respuesta por defecto",
-        speech: speechResponse,
-        displayText: speechResponse,
-        source: "carry-ws"
-    });
-});*/
 
