@@ -386,57 +386,99 @@ restService.post("/webhook", function (req, res) {
   /* EVALUATION RELATED ACTIONS - END */
 
   /* ORDER RELATED ACTIONS - START */
-  else if (req.body.queryResult.intent.displayName == 'order') {
-    if (req.body.queryResult && req.body.queryResult.parameters) {
-      if (req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero) {
-        speech = req.body.queryResult.parameters.numero !== 1 ?
-          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + 's, is this everything that you want to order?' :
-          req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', is this everything that you want to order?';
-      } else {
-        speech = req.body.queryResult.parameters.plato ? req.body.queryResult.parameters.plato + ', is this everything that you want to order?' : "Something didn't go as planned, please repeat your request"
+  else if (req.body.queryResult.intent.displayName == 'placeOrder') {
+    let time;
+    let restaurant;
+    //Select a restaurant and a time for the order to be received
+    if(req.body.queryResult.parameters && req.body.queryResult.parameters.restaurant){
+      restaurant = req.body.queryResult.parameters.restaurant;
+    }
+    if(req.body.queryResult.parameters && req.body.queryResult.parameters.time){
+      time = req.body.queryResult.parameters.time;
+    }
+
+    //Query the items that the shop offers to return to the user
+    var listOfAvailableItems = [];
+    listOfAvailableItems[0] = {"name":"Chocolate cookie", "price": 3, "idwords":["chocolate", "cookie"]};
+    listOfAvailableItems[1] = {"name":"Pizza Margarita (large)", "price": 19.5, "idwords":["large", "margarita"]};
+    listOfAvailableItems[2] = {"name":"4 cheese pizza (medium)", "price": 12, "idwords":["cheese", "4","medium"]};
+    listOfAvailableItems[3] = {"name":"Coca cola (medium)", "price": 2.5, "idwords":["cola", "medium", "coca"]};
+    listOfAvailableItems[4] = {"name":"Meatball pizza (medium)", "price": 15, "idwords":["pizza", "meatball","medium"]};
+
+    // Return response to user
+    return res.json({
+      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + time + '.\n'+
+      'This restaurant contains the following available items ' + listOfAvailableItems + '.',
+      outputContexts: [
+        {
+          name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_order_placed",
+          lifespanCount:5,
+          parameters:{
+            "restaurant" : restaurant,
+            "time" : time,
+            "availableItems" : listOfAvailableItems
+          }
+        }
+      ]
+    });
+  }
+  else if (req.body.queryResult.intent.displayName == 'orderItems') {
+    var contextMatched = false;
+    var itemList;
+    //Recover the list of active orders from context
+    req.body.queryResult.outputContexts.forEach(context =>{
+      //Find the correct context
+      if(context.name === "projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_order_placed"){
+        contextMatched = true;
+        //Find if the variable exists
+        if(context.parameters.availableItems){
+          //Assign variable to the active order list
+          itemList = context.parameters.availableItems;
+        }
+      }
+    });
+
+    if (req.body.queryResult.parameters && req.body.queryResult.parameters.dish) {
+      let wordList = req.body.queryResult.parameters.dish.split(" ");
+      //Check if the selected items are between the available options
+      //For that, iterate all the items in itemList
+      let selectedItem = itemList.forEach(item =>{
+        //If a wordlist includes all the idwords of this specific item, return the item, if not, return null
+        if(item.idwords.every(word => wordList.includes(word))){
+          return item;
+        }else{
+          return null;
+        }
+      });
+      
+      if(selectedItem === null){
+        //Launch error
+        return res.json({
+          fulfillmentText: 'An error took place trying to select an specific item by the words ' + wordList
+        });
+      }else{
+        let specifiedAmount = 1;
+        if (req.body.queryResult.parameters.amount) {
+          specifiedAmount = req.body.queryResult.parameters.amount;
+        }
+        return res.json({
+          fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?'
+        });
       }
     }
-    /*req.body.queryResult.parameters.plato && req.body.queryResult.parameters.numero //&& req.body.queryResult.parameters.direccion
-      ? req.body.queryResult.parameters.numero + ' ' + req.body.queryResult.parameters.plato + ', is this everything that you want to order?'
-      : "Something didn't go as planned, please repeat your request";*/
 
-    var speechResponse = {
-      google: {
-        expectUserResponse: true,
-        richResponse: {
-          items: [
-            {
-              simpleResponse: {
-                textToSpeech: speech
-              }
-            }
-          ]
-        }
-      }
-    };
 
-    return res.json({
-      payload: speechResponse,
-      //data: speechResponse,
-      fulfillmentText: speech,
-      /*fulfillmenMessages: [{
-        quickReplies: {
-          title: "Is this everything?",
-          quickReplies: [
-            "Yes", "No"
-          ]
-        },
-        platform: "GOOGLE ASSISTANT"
-      },
-      {
-        text: {
-          text: ["Dummy"]
-        }
-      }],*/
-      speech: speech,
-      displayText: speech,
-      source: "webhook-echo-sample"
-    });
+
+    // if (req.body.queryResult && req.body.queryResult.parameters) {
+    //   if (req.body.queryResult.parameters.dish && req.body.queryResult.parameters.amount) {
+    //     speech = req.body.queryResult.parameters.amount !== 1 ?
+    //       req.body.queryResult.parameters.amount + ' ' + req.body.queryResult.parameters.dish + 's, is this everything that you want to order?' :
+    //       req.body.queryResult.parameters.amount + ' ' + req.body.queryResult.parameters.dish + ', is this everything that you want to order?';
+    //   } else {
+    //     speech = req.body.queryResult.parameters.dish ? req.body.queryResult.parameters.dish + ', is this everything that you want to order?' : "Something didn't go as planned, please repeat your request"
+    //   }
+    // }
+    
   }
   else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
     var order = '';
