@@ -596,7 +596,7 @@ restService.post("/webhook", function (req, res) {
     //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context => {
       //The context of order items followup will contain selected Items
-      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup") {
+      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderitems-followup") {
         contextMatched = true;
         // Recover the list of previously selected items and push this item to the list
         if(context.parameters.selectedItems){
