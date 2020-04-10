@@ -22,6 +22,14 @@ restService.post("/webhook", function (req, res) {
   var idToken = req.body.originalDetectIntentRequest.payload.user.idToken;
   let userInformationJSON = jwt.decode(idToken);
 
+  /* DEFAULT WELCOME - START */
+  if (req.body.queryResult.intent.displayName == 'actionSelection'){
+    return res.json({
+      fulfillmentText: 'Hello ' + userInformationJSON.given_name + '! I\'m Carry, what can I help you in today?'
+    });
+  }
+  /* DEFAULT WELCOME - END */
+
   /* ACTION SELECTION - START */
   if (req.body.queryResult.intent.displayName == 'actionSelection'){
     //To switch between actions, confirm that the query brings parameters
@@ -51,8 +59,7 @@ restService.post("/webhook", function (req, res) {
 
           // Return response to user
           return res.json({
-            fulfillmentText: 'Hi ' + userInformationJSON.given_name + ', the list of delivered orders is the following: ' + listString + ' which one of them do you want to evaluate?',
-            speech: speech,
+            fulfillmentText: 'The list of delivered orders is the following: ' + listString + ' which one of them do you want to evaluate?',
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_evaluation",
@@ -83,7 +90,7 @@ restService.post("/webhook", function (req, res) {
             }
           }
           return res.json({
-            fulfillmentText: 'Hi ' + userInformationJSON.given_name + ', the list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
+            fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
             speech: speech,
             outputContexts: [
               {
