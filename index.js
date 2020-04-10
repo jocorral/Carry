@@ -589,7 +589,7 @@ restService.post("/webhook", function (req, res) {
   else if (req.body.queryResult.intent.displayName == 'moreItemsYes' || req.body.queryResult.intent.displayName == 'moreItemsNo') {
     var contextMatched = false;
     let availableItems;
-    let selectedItemListF = [];
+    let selectedItemList = [];
     let selectedRestaurant;
     let specifiedDate;
     let specifiedTime;
@@ -603,7 +603,7 @@ restService.post("/webhook", function (req, res) {
         // Recover the list of previously selected items and push this item to the list
         if(context.parameters.selectedItems){
           //Get all the previously selected items in a variable
-          selectedItemListF = context.parameters.selectedItems;
+          selectedItemList = context.parameters.selectedItems;
         }
         
         //Find if the availableItems exists
@@ -639,13 +639,6 @@ restService.post("/webhook", function (req, res) {
       });
     }
     else{
-      return res.json({
-        fulfillmentText: 'Variables (supposedly with values) res ' + selectedRestaurant + ' selectedIt '+ JSON.stringify(selectedItemListF) + ' date ' + specifiedDate +
-        ' time '+ specifiedTime + ' available ' +JSON.stringify(availableItems)
-      });
-    }
-
-    /*if(contextMatched){
       //More items wan to be added
       if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
         let listOfAvailableItemsString = '';
@@ -657,16 +650,16 @@ restService.post("/webhook", function (req, res) {
 
         //Return to previous context with the restaurant related + datetime related + selected items info
         return res.json({
-          fulfillmentText: 'The order in ' + restaurant + ' at ' + time + ' on ' + date + ' has the following items so far: ' +
+          fulfillmentText: 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items so far: ' +
           JSON.stringify(selectedItemList) + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString,
           outputContexts: [
             {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
               lifespanCount: 7,
               parameters: {
-                "restaurant": restaurant,
-                "date": date,
-                "time": timeWithoutSeconds,
+                "restaurant": selectedRestaurant,
+                "date": specifiedDate,
+                "time": specifiedTime,
                 "availableItems": listOfAvailableItems,
                 "selectedItems": selectedItemList
               }
@@ -685,7 +678,7 @@ restService.post("/webhook", function (req, res) {
           for (let i = 0; i < selectedItemList.length; i++) {
             totalCost = totalCost + selectedItemList[i].price;
           }
-          response = 'The order in ' + restaurant + ' at ' + time + ' on ' + date + ' has the following items: ' +
+          response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: ' +
           JSON.stringify(selectedItemList) + '. The total cost of this operation is ' + totalCost + ' This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
           'Card number, the month when the validity of the card ends and the CVC code (which you can find behind your card).'
         }else{
@@ -701,10 +694,10 @@ restService.post("/webhook", function (req, res) {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_payment",
               lifespanCount: 5,
               parameters: {
-                "restaurant": restaurant,
-                "date": date,
-                "time": timeWithoutSeconds,
-                "availableItems": listOfAvailableItems,
+                "restaurant": selectedRestaurant,
+                "date": specifiedDate,
+                "time": specifiedTime,
+                "availableItems": availableItems,
                 "selectedItems": selectedItemList
               }
             }
@@ -712,7 +705,7 @@ restService.post("/webhook", function (req, res) {
         });
       }
       
-    }*/
+    }
     
   }
   /* ORDER RELATED ACTIONS - END */
