@@ -416,14 +416,14 @@ restService.post("/webhook", function (req, res) {
     var regExTime = /(?<=T)(.*?)(?=\+)/g;
     var regExDate = /(.*?)(?=T)/g;
     let time = regExTime.exec(datetime)[0];
-    let timeWithoutSeconds = time.substring(0, time.length - 3);
+    //let timeWithoutSeconds = time.substring(0, time.length - 3);
     let date = regExDate.exec(datetime)[0];
 
 
 
     // Return response to user
     return res.json({
-      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + timeWithoutSeconds + '.\n' + // 
+      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + // 
         'This restaurant contains the following available items ' + listOfAvailableItemsString + '.',
       outputContexts: [
         {
@@ -455,12 +455,12 @@ restService.post("/webhook", function (req, res) {
       }
     });
 
-    if (req.body.queryResult.parameters && req.body.queryResult.parameters.dish) {
-      let wordList = req.body.queryResult.parameters.dish[0].split(" ");
+    /*if (req.body.queryResult.parameters && req.body.queryResult.parameters.dish) {
+      //let wordList = req.body.queryResult.parameters.dish[0].split(" ");
       //Check if the selected items are between the available options
       //For that, iterate all the items in itemList
 
-      /*let selectedItem = null;
+      let selectedItem = null;
       listOfAvailableItems.forEach(item => {
         //If a wordlist includes all the idwords of this specific item, return the item, if not, return null
         if (item.idwords.every(word => wordList.includes(word))) {
@@ -494,10 +494,10 @@ restService.post("/webhook", function (req, res) {
           //   }
           // ]
         });
-      }*/
-    }
+      }
+    }*/
     return res.json({
-      fulfillmentText: 'List items ' + JSON.stringify(itemList) + ' parameters ' + JSON.stringify(wordList)
+      fulfillmentText: 'List items ' + JSON.stringify(itemList) + ' parameters ' + JSON.stringify(req.body.queryResult.parameters.dish)
     });
   }
   else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
