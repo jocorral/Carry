@@ -416,13 +416,13 @@ restService.post("/webhook", function (req, res) {
     var regExTime = '(?<=T)(.*?)(?=\+)';
     var regExDate = '(.*?)(?=T)';
     let time = regExTime.exec(datetime);
-    let timeWothoutSeconds = time.substring(0, time.length - 2);
+    let timeWithoutSeconds = time.substring(0, time.length - 2);
     let date = regExDate.exec(datetime);
 
 
     // Return response to user
     return res.json({
-      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n'+
+      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + datetime + '.\n'+
       'This restaurant contains the following available items ' + listOfAvailableItemsString + '.',
       outputContexts: [
         {
