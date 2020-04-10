@@ -588,7 +588,7 @@ restService.post("/webhook", function (req, res) {
 
   else if (req.body.queryResult.intent.displayName == 'moreItemsYes' || req.body.queryResult.intent.displayName == 'moreItemsNo') {
     var contextMatched = false;
-    var itemList;
+    var listOfAvailableItems;
     var selectedItemList = [];
     var restaurant;
     var date;
@@ -632,14 +632,14 @@ restService.post("/webhook", function (req, res) {
     //If context wasn't found, send a message to user
     if (!contextMatched) {
       return res.json({
-        fulfillmentText: 'Some error with the context names took place, please try again.'
+        fulfillmentText: 'Some error with the context names took place, please try again. restaurant ' +JSON.stringify(restaurant)+ ' selected item ' +JSON.stringify(selectedItemList)+
+        + ' date ' +JSON.stringify(date)+ ' date ' +JSON.stringify(time)+ ' available items '+ JSON.stringify(listOfAvailableItems)
       });
     }
 
     if(contextMatched){
       //More items wan to be added
       if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
-        
         let listOfAvailableItemsString = '';
         if (listOfAvailableItems.length !== 0) {
           for (let i = 0; i < listOfAvailableItems.length; i++) {
