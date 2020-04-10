@@ -416,7 +416,7 @@ restService.post("/webhook", function (req, res) {
     var regExTime = /(?<=T)(.*?)(?=\+)/g;
     var regExDate = /(.*?)(?=T)/g;
     let time = regExTime.exec(datetime)[0];
-    //let timeWithoutSeconds = time.substring(0, time.length - 3);
+    let timeWithoutSeconds = time.substring(0, time.length - 3);
     let date = regExDate.exec(datetime)[0];
 
 
