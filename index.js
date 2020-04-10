@@ -452,19 +452,21 @@ restService.post("/webhook", function (req, res) {
         }
       }
     });
-    let wordList = req.body.queryResult.parameters.dish[0].split(" ");
+
     if (req.body.queryResult.parameters && req.body.queryResult.parameters.dish) {
       let wordList = req.body.queryResult.parameters.dish[0].split(" ");
       //Check if the selected items are between the available options
       //For that, iterate all the items in itemList
-
       let selectedItem = null;
       listOfAvailableItems.forEach(item => {
         //If a wordlist includes all the idwords of this specific item, return the item, if not, return null
         if (item.idwords.every(word => wordList.includes(word))) {
+          console.log('selected item ' + JSON.stringify(item));
           selectedItem = item;
         }
       });
+
+      let itemString = JSON.stringify(selectedItem);
 
       /*if (selectedItem === null) {
         //Launch error
@@ -494,7 +496,7 @@ restService.post("/webhook", function (req, res) {
         });
       }*/
       return res.json({
-        fulfillmentText: 'You\'ve selected ' + selectedItem.name + ' the selected amount is in parameters ' + JSON.stringify(req.body.queryResult.parameters)
+        fulfillmentText: 'You\'ve selected ' + itemString + ' the selected amount is in parameters ' + JSON.stringify(req.body.queryResult.parameters)
       });
     }
   }
