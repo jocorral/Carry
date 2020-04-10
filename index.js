@@ -548,7 +548,7 @@ restService.post("/webhook", function (req, res) {
                 "selectedItems" : selectedItemList,
                 "restaurant" : restaurant,
                 "date" : date,
-                "time" : timeWithoutSeconds,
+                "time" : time,
                 "availableItems" : itemList
               }
             }
@@ -574,7 +574,7 @@ restService.post("/webhook", function (req, res) {
                 "selectedItems" : selectedItemList,
                 "restaurant" : restaurant,
                 "date" : date,
-                "time" : timeWithoutSeconds,
+                "time" : time,
                 "availableItems" : itemList
               }
             }
