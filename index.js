@@ -561,7 +561,7 @@ restService.post("/webhook", function (req, res) {
       }
     }
   }
-  else if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
+  else if (req.body.queryResult.intent.displayName == 'moreItemsYes' ||req.body.queryResult.intent.displayName == 'moreItemsNo') {
     var contextMatched = true;
     var itemList;
     var selectedItemList = [];
@@ -587,7 +587,7 @@ restService.post("/webhook", function (req, res) {
         //Find if the availableItems exists
         if (context.parameters.availableItems) {
           //Assign variable to the active order list
-          itemList = context.parameters.availableItems;
+          listOfAvailableItems = context.parameters.availableItems;
         }
 
         //Find if the restaurant exists
@@ -613,59 +613,76 @@ restService.post("/webhook", function (req, res) {
     });
 
     if(contextMatched){
-      let listOfAvailableItemsString = '';
-      if (listOfAvailableItems.length !== 0) {
-        for (let i = 0; i < listOfAvailableItems.length; i++) {
-          listOfAvailableItemsString = listOfAvailableItemsString + (i + 1) + ' - ' + listOfAvailableItems[i].name + '\n';
+      //More items wan to be added
+      if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
+        
+        let listOfAvailableItemsString = '';
+        if (listOfAvailableItems.length !== 0) {
+          for (let i = 0; i < listOfAvailableItems.length; i++) {
+            listOfAvailableItemsString = listOfAvailableItemsString + (i + 1) + ' - ' + listOfAvailableItems[i].name + '\n';
+          }
         }
+
+        //Return to previous context with the restaurant related + datetime related + selected items info
+        return res.json({
+          fulfillmentText: 'The order in ' + restaurant + ' at ' + time + ' on ' + date + ' has the following items so far: ' +
+          JSON.stringify(selectedItemList) + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString,
+          outputContexts: [
+            {
+              name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
+              lifespanCount: 7,
+              parameters: {
+                "restaurant": restaurant,
+                "date": date,
+                "time": timeWithoutSeconds,
+                "availableItems": listOfAvailableItems,
+                "selectedItems": selectedItemList
+              }
+            }
+          ]
+        });
       }
 
-      //Return to previous context with the restaurant related + datetime related + selected items info
-      return res.json({
-        fulfillmentText: 'The order in ' + restaurant + ' at ' + time + ' on ' + date + ' has the following items so far: ' +
-        JSON.stringify(selectedItemList) + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString,
-        outputContexts: [
-          {
-            name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
-            lifespanCount: 7,
-            parameters: {
-              "restaurant": restaurant,
-              "date": date,
-              "time": timeWithoutSeconds,
-              "availableItems": listOfAvailableItems,
-              "selectedItems": selectedItemList
-            }
+      //No more items want to be ordered
+      else{
+        let response;
+        let totalCost = 0;
+        //If no item was selected, the order can not be placed
+        if (selectedItemList.length !== 0) {
+          //Calculate total cost
+          for (let i = 0; i < selectedItemList.length; i++) {
+            totalCost = totalCost + selectedItemList[i].price;
           }
-        ]
-      });
+          response = 'The order in ' + restaurant + ' at ' + time + ' on ' + date + ' has the following items: ' +
+          JSON.stringify(selectedItemList) + '. The total cost of this operation is ' + totalCost + ' This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
+          'Card number, the month when the validity of the card ends and the CVC code (which you can find behind your card).'
+        }else{
+          response = 'No item was selected, no order can be placed.';
+        }
+
+        
+        //No more items want to be added
+        return res.json({
+          fulfillmentText: response,
+          outputContexts: [
+            {
+              name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_payment",
+              lifespanCount: 5,
+              parameters: {
+                "restaurant": restaurant,
+                "date": date,
+                "time": timeWithoutSeconds,
+                "availableItems": listOfAvailableItems,
+                "selectedItems": selectedItemList
+              }
+            }
+          ]
+        });
+      }
+      
     }
   }
-  else if (req.body.queryResult.intent.displayName == 'moreItemsNo') {
-    
-  }
 
-
-  else if (req.body.queryResult.intent.displayName == 'paymentMethod') {
-    var totalCost = 0;
-    //This variable indicates whether the user wants to pay the order by credit card or manually
-    var payByCredCard = null;
-    if (req.body.queryResult && req.body.queryResult.parameters) {
-      payByCredCard = req.body.queryResult.parameters.method == 'creditCard' ? true : false;
-      // Calculate payment
-    }
-
-    if (payByCredCard != null)
-      //If payment wants to be done by hand, save order in db, elsewise, launch next intent
-      speech = !payByCredCard ? 'You selected the payment to be manual. Please wait for an email confirmation of the transaction.' : 'Please indicate the credit card number, its date of expiry and its CVV.'
-
-    return res.json({
-      //data: speechResponse,
-      fulfillmentText: speech,
-      speech: speech,
-      displayText: speech,
-      source: "webhook-echo-sample"
-    });
-  }
   else if (req.body.queryResult.intent.displayName == 'pay') {
     var transactionCost = 0;
     var creditCardPAN = '';
