@@ -454,7 +454,35 @@ restService.post("/webhook", function (req, res) {
     });
 
     if (req.body.queryResult.parameters && req.body.queryResult.parameters.dish) {
+      //Create a list of the said words
       let wordList = req.body.queryResult.parameters.dish[0].split(" ");
+
+      //Clean list of plurals
+      const endings = {
+        ves: 'fe',
+        ies: 'y',
+        i: 'us',
+        zes: '',
+        ses: '',
+        es: '',
+        s: ''
+      };
+      
+      for(let i = 0; i<wordList.length; i++){
+          //Irregular cases
+          if(wordList[i].toLowerCase() === 'cookies'){
+            wordList[i] = 'cookie';
+          }
+          else if(wordList[i].toLowerCase() === 'smoothies'){
+            wordList[i] = 'smoothie';
+          }
+          else{
+            wordList[i] = wordList[i].replace(
+            new RegExp(`(${Object.keys(endings).join('|')})$`),
+            r => endings[r]);   
+          }
+      }
+
       //Check if the selected items are between the available options
       //For that, iterate all the items in itemList
       let selectedItem = null;
@@ -473,14 +501,14 @@ restService.post("/webhook", function (req, res) {
           fulfillmentText: 'An error took place trying to select an specific item by the words ' + wordList
         });
       } else {
-        
+
         // TODO Recover the list of previously selected items and push this item to the list
-        
+
         let specifiedAmount = 1;
         if (req.body.queryResult.parameters.amount) {
           specifiedAmount = req.body.queryResult.parameters.amount;
         }
-        
+
         return res.json({
           fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', is this everything that you want to order?'
           // outputContexts : [
