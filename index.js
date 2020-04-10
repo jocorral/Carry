@@ -542,10 +542,14 @@ restService.post("/webhook", function (req, res) {
           fulfillmentText: response,
           outputContexts : [
             {
-              name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderitems-followup",
+              name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup",
               lifespanCount: 2,
               parameters: {
-                "selectedItems" : selectedItemList
+                "selectedItems" : selectedItemList,
+                "restaurant" : restaurant,
+                "date" : date,
+                "time" : time,
+                "availableItems" : itemList
               }
             }
           ]
@@ -564,7 +568,7 @@ restService.post("/webhook", function (req, res) {
           fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', would you like to add any other item to this order?',
           outputContexts : [
             {
-              name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderitems-followup",
+              name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup",
               lifespanCount: 2,
               parameters: {
                 "selectedItems" : selectedItemList,
@@ -581,9 +585,9 @@ restService.post("/webhook", function (req, res) {
     }
 
   }
+
   else if (req.body.queryResult.intent.displayName == 'moreItemsYes' || req.body.queryResult.intent.displayName == 'moreItemsNo') {
-    var context1Matched = false;
-    var context2Matched = false;
+    var contextMatched = false;
     var listOfAvailableItems;
     var selectedItemList = [];
     var restaurant;
@@ -592,44 +596,48 @@ restService.post("/webhook", function (req, res) {
     //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context => {
       //The context of order items followup will contain selected Items
-      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderitems-followup") {
-        context1Matched = true;
+      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup") {
+        contextMatched = true;
         // Recover the list of previously selected items and push this item to the list
         if(context.parameters.selectedItems){
           //Get all the previously selected items in a variable
           selectedItemList = context.parameters.selectedItems;
         }
-      }
-
-      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed") {
-        context2Matched = true;
-        if(context.parameters.time){
-          //Get all the previously selected items in a variable
-          time = context.parameters.time;
+        
+        //Find if the availableItems exists
+        if (context.parameters.availableItems) {
+          //Assign variable to the active order list
+          listOfAvailableItems = context.parameters.availableItems;
         }
-        if(context.parameters.restaurant){
-          //Get all the previously selected items in a variable
+
+        //Find if the restaurant exists
+        if (context.parameters.restaurant) {
+          //Assign variable to the active order list
           restaurant = context.parameters.restaurant;
         }
-        if(context.parameters.date){
-          //Get all the previously selected items in a variable
+
+        //Find if the date exists
+        if (context.parameters.date) {
+          //Assign variable to the active order list
           date = context.parameters.date;
         }
-        if(context.parameters.availableItems){
-          //Get all the previously selected items in a variable
-          listOfAvailableItems = context.parameters.availableItems;
+
+        //Find if the time exists
+        if (context.parameters.time) {
+          //Assign variable to the active order list
+          time = context.parameters.time;
         }
       }
     });
     
     //If context wasn't found, send a message to user
-    if (!(context1Matched && context2Matched)) {
+    if (!contextMatched) {
       return res.json({
-        fulfillmentText: 'Con ' +JSON.stringify(req.body.queryResult.outputContexts.length) + JSON.stringify(req.body.queryResult.outputContexts)
+        fulfillmentText: JSON.stringify(req.body.queryResult.outputContexts)
       });
     }
 
-    if((context1Matched && context2Matched)){
+    if(contextMatched){
       //More items wan to be added
       if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
         let listOfAvailableItemsString = '';
