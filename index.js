@@ -25,7 +25,7 @@ restService.post("/webhook", function (req, res) {
   /* DEFAULT WELCOME - START */
   if (req.body.queryResult.intent.displayName == 'defaultWelcome'){
     return res.json({
-      fulfillmentText: 'Hello ' + userInformationJSON.given_name + '! I\'m Carry, what can I help you in today?'
+      fulfillmentText: 'Hello ' + JSON.stringify(userInformationJSON) + '! I\'m Carry, what can I help you in today?'
     });
   }
   /* DEFAULT WELCOME - END */
