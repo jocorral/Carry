@@ -587,7 +587,7 @@ restService.post("/webhook", function (req, res) {
   }
 
   else if (req.body.queryResult.intent.displayName == 'moreItemsYes' || req.body.queryResult.intent.displayName == 'moreItemsNo') {
-    var contextMatched = true;
+    var contextMatched = false;
     var itemList;
     var selectedItemList = [];
     var restaurant;
@@ -597,6 +597,7 @@ restService.post("/webhook", function (req, res) {
     req.body.queryResult.outputContexts.forEach(context => {
       //The context of order items followup will contain selected Items
       if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup") {
+        contextMatched = true;
         // Recover the list of previously selected items and push this item to the list
         if(context.parameters.selectedItems){
           //Get all the previously selected items in a variable
@@ -626,8 +627,6 @@ restService.post("/webhook", function (req, res) {
           //Assign variable to the active order list
           time = context.parameters.time;
         }
-      }else{
-        contextMatched = false;
       }
     });
     //If context wasn't found, send a message to user
