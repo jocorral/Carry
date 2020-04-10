@@ -588,11 +588,11 @@ restService.post("/webhook", function (req, res) {
 
   else if (req.body.queryResult.intent.displayName == 'moreItemsYes' || req.body.queryResult.intent.displayName == 'moreItemsNo') {
     var contextMatched = false;
-    var listOfAvailableItems;
-    var selectedItemList = [];
-    var restaurant;
-    var date;
-    var time;
+    let listOfAvailableItems;
+    let selectedItemList = [];
+    let restaurant;
+    let date;
+    let time;
     var relevantContext;
     //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context => {
@@ -640,7 +640,8 @@ restService.post("/webhook", function (req, res) {
     }
     else{
       return res.json({
-        fulfillmentText: 'Order item followup context is ' + JSON.stringify(relevantContext.parameters)
+        fulfillmentText: 'Variables (supposedly with values) res ' + restaurant + ' selectedIt '+ selectedItemList.length + ' date ' + date +
+        ' time '+ time + ' available ' +availableItems.length
       });
     }
 
