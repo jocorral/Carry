@@ -643,7 +643,7 @@ restService.post("/webhook", function (req, res) {
       if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
         let listOfAvailableItemsString = '';
         if (availableItems.length !== 0) {
-          for (let i = 0; i < listOfAvailableItems.length; i++) {
+          for (let i = 0; i < availableItems.length; i++) {
             listOfAvailableItemsString = listOfAvailableItemsString + (i + 1) + ' - ' + availableItems[i].name + '\n';
           }
         }
@@ -660,7 +660,7 @@ restService.post("/webhook", function (req, res) {
                 "restaurant": selectedRestaurant,
                 "date": specifiedDate,
                 "time": specifiedTime,
-                "availableItems": listOfAvailableItems,
+                "availableItems": availableItems,
                 "selectedItems": selectedItemList
               }
             }
