@@ -442,6 +442,10 @@ restService.post("/webhook", function (req, res) {
     var contextMatched = false;
     var itemList;
     var selectedItemList = [];
+    var restaurant;
+    var date;
+    var time;
+
     //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context => {
       //Find the correct context
@@ -452,7 +456,18 @@ restService.post("/webhook", function (req, res) {
           //Assign variable to the active order list
           itemList = context.parameters.availableItems;
         }
-
+        if (context.parameters.restaurant) {
+          //Assign variable to the active order list
+          restaurant = context.parameters.restaurant;
+        }
+        if (context.parameters.time) {
+          //Assign variable to the active order list
+          time = context.parameters.time;
+        }
+        if (context.parameters.date) {
+          //Assign variable to the active order list
+          date = context.parameters.date;
+        }
         // Recover the list of previously selected items and push this item to the list
         if(context.parameters.selectedItems){
           //Get all the previously selected items in a variable
@@ -530,7 +545,11 @@ restService.post("/webhook", function (req, res) {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup",
               lifespanCount: 2,
               parameters: {
-                "selectedItems" : selectedItemList
+                "selectedItems" : selectedItemList,
+                "restaurant" : restaurant,
+                "date" : date,
+                "time" : timeWithoutSeconds,
+                "availableItems" : itemList
               }
             }
           ]
@@ -577,13 +596,7 @@ restService.post("/webhook", function (req, res) {
           //Get all the previously selected items in a variable
           selectedItemList = context.parameters.selectedItems;
         }
-      }else{
-        contextMatched = false;
-      }
-      
-      //The context of order placed will contain restaurant related information and date/time info.
-      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed") {
-        contextMatched = true;
+        
         //Find if the availableItems exists
         if (context.parameters.availableItems) {
           //Assign variable to the active order list
@@ -611,6 +624,12 @@ restService.post("/webhook", function (req, res) {
         contextMatched = false;
       }
     });
+    //If context wasn't found, send a message to user
+    if (!contextMatched) {
+      return res.json({
+        fulfillmentText: 'Some error with the context names took place, please try again.'
+      });
+    }
 
     /*if(contextMatched){
       //More items wan to be added
@@ -686,7 +705,9 @@ restService.post("/webhook", function (req, res) {
       JSON.stringify(selectedItemList) + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString
     });
   }
+  /* ORDER RELATED ACTIONS - END */
 
+  /* PAYMENT - START */
   else if (req.body.queryResult.intent.displayName == 'pay') {
     var transactionCost = 0;
     var creditCardPAN = '';
@@ -706,7 +727,7 @@ restService.post("/webhook", function (req, res) {
       source: "webhook-echo-sample"
     });
   }
-  /* ORDER RELATED ACTIONS - START */
+  /* PAYMENT - END */
 
 
   /* NO RELATED ACTIONS */
