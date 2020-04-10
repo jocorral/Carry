@@ -633,8 +633,8 @@ restService.post("/webhook", function (req, res) {
     //If context wasn't found, send a message to user
     if (!contextMatched) {
       let str = '';
-      for(let i = 2; i< req.body.queryResult.outputContexts.length; i++){
-        str = str+' '+req.body.queryResult.outputContexts[i].name;
+      for(let i = 0; i< req.body.queryResult.outputContexts.length; i++){
+        str = str+' '+req.body.queryResult.outputContexts[i].name.substring(req.body.queryResult.outputContexts[i].name.length - 35);
       }
       return res.json({
         fulfillmentText: JSON.stringify(str)
