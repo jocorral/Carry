@@ -571,7 +571,11 @@ restService.post("/webhook", function (req, res) {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup",
               lifespanCount: 2,
               parameters: {
-                "selectedItems" : selectedItemList
+                "selectedItems" : selectedItemList,
+                "restaurant" : restaurant,
+                "date" : date,
+                "time" : timeWithoutSeconds,
+                "availableItems" : itemList
               }
             }
           ]
@@ -579,8 +583,10 @@ restService.post("/webhook", function (req, res) {
 
       }
     }
+
   }
-  else if (req.body.queryResult.intent.displayName == 'moreItemsYes' ||req.body.queryResult.intent.displayName == 'moreItemsNo') {
+
+  else if (req.body.queryResult.intent.displayName == 'moreItemsYes' || req.body.queryResult.intent.displayName == 'moreItemsNo') {
     var contextMatched = true;
     var itemList;
     var selectedItemList = [];
