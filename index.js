@@ -461,14 +461,13 @@ restService.post("/webhook", function (req, res) {
       itemList.forEach(item => {
         //If a wordlist includes all the idwords of this specific item, return the item, if not, return null
         if (item.idwords.every(word => wordList.includes(word))) {
-          console.log('selected item ' + JSON.stringify(item));
           selectedItem = item;
         }
       });
 
       let itemString = JSON.stringify(selectedItem);
 
-      /*if (selectedItem === null) {
+      if (selectedItem === null) {
         //Launch error
         return res.json({
           fulfillmentText: 'An error took place trying to select an specific item by the words ' + wordList
@@ -494,10 +493,7 @@ restService.post("/webhook", function (req, res) {
           //   }
           // ]
         });
-      }*/
-      return res.json({
-        fulfillmentText: 'You\'ve selected ' + itemString + ' the selected amount is in parameters ' + JSON.stringify(req.body.queryResult.parameters)
-      });
+      }
     }
   }
   else if (req.body.queryResult.intent.displayName == 'confirmOrder') {
