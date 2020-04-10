@@ -458,7 +458,7 @@ restService.post("/webhook", function (req, res) {
       //Check if the selected items are between the available options
       //For that, iterate all the items in itemList
       let selectedItem = null;
-      listOfAvailableItems.forEach(item => {
+      itemList.forEach(item => {
         //If a wordlist includes all the idwords of this specific item, return the item, if not, return null
         if (item.idwords.every(word => wordList.includes(word))) {
           console.log('selected item ' + JSON.stringify(item));
