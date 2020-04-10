@@ -615,19 +615,19 @@ restService.post("/webhook", function (req, res) {
         //Find if the restaurant exists
         if (context.parameters.restaurant) {
           //Assign variable to the active order list
-          restaurant = context.parameters.restaurant;
+          selectedRestaurant = context.parameters.restaurant;
         }
 
         //Find if the date exists
         if (context.parameters.date) {
           //Assign variable to the active order list
-          date = context.parameters.date;
+          specifiedDate = context.parameters.date;
         }
 
         //Find if the time exists
         if (context.parameters.time) {
           //Assign variable to the active order list
-          time = context.parameters.time;
+          specifiedTime = context.parameters.time;
         }
       }
     });
@@ -649,9 +649,9 @@ restService.post("/webhook", function (req, res) {
       //More items wan to be added
       if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
         let listOfAvailableItemsString = '';
-        if (listOfAvailableItems.length !== 0) {
+        if (availableItems.length !== 0) {
           for (let i = 0; i < listOfAvailableItems.length; i++) {
-            listOfAvailableItemsString = listOfAvailableItemsString + (i + 1) + ' - ' + listOfAvailableItems[i].name + '\n';
+            listOfAvailableItemsString = listOfAvailableItemsString + (i + 1) + ' - ' + availableItems[i].name + '\n';
           }
         }
 
