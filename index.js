@@ -112,7 +112,7 @@ restService.post("/webhook", function (req, res) {
         ){
           //If an order wants to be cancelled, the context is set to cancelation
           return res.json({
-            fulfillmentText: 'Hi ' + userInformationJSON.given_name + ', where do you want to make the order and for what time do you want it?',
+            fulfillmentText: 'Where do you want to make the order and for what time do you want it?',
             outputContexts: [
               {
                 name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_order",
@@ -397,6 +397,8 @@ restService.post("/webhook", function (req, res) {
       time = req.body.queryResult.parameters.time;
     }
 
+    var listOfAvailableItemsString = '';
+
     //Query the items that the shop offers to return to the user
     var listOfAvailableItems = [];
     listOfAvailableItems[0] = {"name":"Chocolate cookie", "price": 3, "idwords":["chocolate", "cookie"]};
@@ -404,11 +406,16 @@ restService.post("/webhook", function (req, res) {
     listOfAvailableItems[2] = {"name":"4 cheese pizza (medium)", "price": 12, "idwords":["cheese", "4","medium"]};
     listOfAvailableItems[3] = {"name":"Coca cola (medium)", "price": 2.5, "idwords":["cola", "medium", "coca"]};
     listOfAvailableItems[4] = {"name":"Meatball pizza (medium)", "price": 15, "idwords":["pizza", "meatball","medium"]};
+    if(listOfAvailableItems.length !== 0){
+      for(let i = 0; i< listOfAvailableItems.length; i++){
+        listOfAvailableItemsString = listOfAvailableItemsString + (i+1) + ' - ' + listOfAvailableItems[i].name +  '\n';
+      }
+    }
 
     // Return response to user
     return res.json({
       fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + time + '.\n'+
-      'This restaurant contains the following available items ' + listOfAvailableItems + '.',
+      'This restaurant contains the following available items ' + listOfAvailableItemsString + '.',
       outputContexts: [
         {
           name:"projects/"+PROJECT_ID+"/agent/sessions/"+SESSION_ID+"/contexts/await_order_placed",
