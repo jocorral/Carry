@@ -409,7 +409,7 @@ restService.post("/webhook", function (req, res) {
     listOfAvailableItems[4] = { "name": "Meatball pizza (medium)", "price": 15, "idwords": ["pizza", "meatball", "medium"] };
     if (listOfAvailableItems.length !== 0) {
       for (let i = 0; i < listOfAvailableItems.length; i++) {
-        listOfAvailableItemsString = listOfAvailableItemsString + (i + 1) + ' - ' + listOfAvailableItems[i].name + '\n';
+        listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + listOfAvailableItems[i].name + '\n';
       }
     }
 
@@ -686,7 +686,7 @@ restService.post("/webhook", function (req, res) {
             selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name;
           }
           response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: ' +
-          selectedItemListStr + '. The total cost of this operation is ' + totalCost + ' This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
+          selectedItemListStr + '. The total cost of this operation is ' + totalCost + '€. This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
           'Card number, the month when the validity of the card ends and the CVC code (which you can find behind your card).'
         }else{
           response = 'No item was selected, no order can be placed.';
@@ -725,7 +725,7 @@ restService.post("/webhook", function (req, res) {
     var cvc = '';
     var saveCreditCard = false;
 
-    //If it wants to be saved, save it in mongo
+    //TODO save it in mongo
     //Call external API and make payment
     //Call external API to send an email
 
