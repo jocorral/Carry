@@ -109,7 +109,8 @@ restService.post("/webhook", function (req, res) {
         else if (
           req.body.queryResult.parameters.selectedAction.includes('to make') ||
           req.body.queryResult.parameters.selectedAction.includes('to place') ||
-          req.body.queryResult.parameters.selectedAction.includes('to order')
+          req.body.queryResult.parameters.selectedAction.includes('to order')||
+          req.body.queryResult.parameters.selectedAction.includes('to create')
         ) {
           //If an order wants to be cancelled, the context is set to cancelation
           return res.json({
@@ -333,7 +334,7 @@ restService.post("/webhook", function (req, res) {
       }
       else {
         return res.json({
-          fulfillmentText: 'You want to set a value of ' + insertedValue + ' in the position number ' + selectedPosition + ', is that right?',
+          fulfillmentText: 'You want to set a value of ' + insertedValue + ' in the order in the position number ' + selectedPosition + ', is that right?',
           outputContexts: [{
             name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/setEvaluationValue-followup",
             lifespanCount: 2,
@@ -423,7 +424,7 @@ restService.post("/webhook", function (req, res) {
     // Return response to user
     return res.json({
       fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + // 
-        'This restaurant contains the following available items ' + listOfAvailableItemsString + '.',
+        'This restaurant contains the following available items:\n' + listOfAvailableItemsString + '.',
       outputContexts: [
         {
           name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
@@ -644,19 +645,19 @@ restService.post("/webhook", function (req, res) {
         let listOfAvailableItemsString = '';
         if (availableItems.length !== 0) {
           for (let i = 0; i < availableItems.length; i++) {
-            listOfAvailableItemsString = listOfAvailableItemsString + (i + 1) + ' - ' + availableItems[i].name + '\n';
+            listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + availableItems[i].name + '\n';
           }
         }
 
         let selectedItemListStr = '';
         for(let i = 0; i < selectedItemList.length; i++){
-          selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name;
+          selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name + '\n';
         }
 
         //Return to previous context with the restaurant related + datetime related + selected items info
         return res.json({
           fulfillmentText: 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items so far: ' +
-          selectedItemListStr + '. Which one of the following list would you like to add to them? ' + listOfAvailableItemsString,
+          selectedItemListStr + '. Which one of the following list would you like to add to them? \n' + listOfAvailableItemsString,
           outputContexts: [
             {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
@@ -683,10 +684,10 @@ restService.post("/webhook", function (req, res) {
           //Calculate total cost
           for (let i = 0; i < selectedItemList.length; i++) {
             totalCost = totalCost + selectedItemList[i].price;
-            selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name;
+            selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name + '\n';
           }
-          response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: ' +
-          selectedItemListStr + '. The total cost of this operation is ' + totalCost + '€. This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
+          response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: \n' +
+          selectedItemListStr + '.\n The total cost of this operation is ' + totalCost + '€. This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
           'Card number, the month when the validity of the card ends and the CVC code (which you can find behind your card).'
         }else{
           response = 'No item was selected, no order can be placed.';
