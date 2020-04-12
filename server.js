@@ -10,7 +10,11 @@ app.use(bodyParser.json());
 const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
 //URI OK const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/CarryDB?retryWrites=true&w=majority";
 //To connect to db, create an asynchronous method that calls the mongoose extension and connects with the specified uri
-mongoose.connect(URI, { useUnifiedTopology: true, useNewUrlParser: true }, () =>
+mongoose.connect(URI, { 
+    useMongoClient: true,
+    useUnifiedTopology: true,
+    useNewUrlParser: true 
+}, () =>
     console.log('Carry cluster in Mongodb has been reached')
 );
 

@@ -3,7 +3,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const jwt = require('jsonwebtoken');
-var converter = require('number-to-words');
+const converter = require('number-to-words');
+const mongoose = require('mongoose');
+
+const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
 
 const restService = express();
 
@@ -11,6 +14,14 @@ restService.use(
   bodyParser.urlencoded({
     extended: true
   })
+);
+
+mongoose.connect(URI, { 
+  useMongoClient: true,
+  useUnifiedTopology: true,
+  useNewUrlParser: true 
+}, () =>
+  console.log('Carry cluster in Mongodb has been reached')
 );
 
 restService.use(bodyParser.json());
