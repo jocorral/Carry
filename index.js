@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const converter = require('number-to-words');
 const mongoose = require('mongoose');
 
-const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
+const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/CarryBD?retryWrites=true&w=majority";
 
 const restService = express();
 
@@ -140,7 +140,7 @@ restService.post("/webhook", function (req, res) {
 
           // Return response to user
           return res.json({
-            fulfillmentText: 'Ok ' + userInformationJSON.given_name + ' with email ' + userInformationJSON.email
+            fulfillmentText: 'All the user information is ' + JSON.stringify(userInformationJSON)
           });
         }
 

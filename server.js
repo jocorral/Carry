@@ -7,7 +7,7 @@ app.use(bodyParser.json());
 
 //URI format mongodb+srv://<username>:<password>@namecluster....
 //URI DE PRUEBA
-const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
+const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/CarryDB?retryWrites=true&w=majority";
 //URI OK const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/CarryDB?retryWrites=true&w=majority";
 //To connect to db, create an asynchronous method that calls the mongoose extension and connects with the specified uri
 mongoose.connect(URI, { 
