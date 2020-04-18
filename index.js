@@ -433,9 +433,9 @@ restService.post("/webhook", function (req, res) {
               .then(docs => {
                 docs.forEach(dish => {
                   listOfAvailableItems.push({
-                    name: dish.name,
-                    price: dish.price,
-                    idWords: dish.idWords
+                    "name": dish.name,
+                    "price": dish.price,
+                    "idwords": dish.idWords
                   })
                 });
 
@@ -575,7 +575,7 @@ restService.post("/webhook", function (req, res) {
       let selectedItem = null;
       itemList.forEach(item => {
         //If a wordlist includes all the idWords of this specific item, return the item, if not, return null
-        if (item.idWords.every(word => wordList.includes(word))) {
+        if (item.idwords.every(word => wordList.includes(word))) {
           selectedItem = item;
         }
       });
