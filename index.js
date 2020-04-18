@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const Dish = require('./DB/Dish');
 const Establishment = require('./DB/Establishment');
 
-const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/CarryBD?retryWrites=true&w=majority";
+const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
 
 const restService = express();
 
