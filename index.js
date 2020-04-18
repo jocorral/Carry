@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const Dish = require('./DB/Dish');
 const Order = require('./DB/Order');
 const OrderLine = require('./DB/OrderLine');
+const OrderLineList = require('./DB/OrderLineList');
 const Establishment = require('./DB/Establishment');
 
 const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
