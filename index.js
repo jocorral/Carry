@@ -19,7 +19,7 @@ restService.use(
 );
 
 mongoose.connect(URI, {
-  useMongoClient: true,
+  //useMongoClient: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
   useNewUrlParser: true
@@ -477,21 +477,15 @@ restService.post("/webhook", function (req, res) {
           }
         }else{
           return res.json({
-            fulfillmentText: 'No establishment found with the name of' + restaurant + ' ' + JSON.stringify(docs)
+            fulfillmentText: 'No establishment found with the name of ' + restaurant + ' ' + JSON.stringify(docs)
           });
         }
       })
       .catch(err => {
         return res.json({
-          fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with with that name ' + err
+          fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with the name ' + restaurant + ' ' + err
         });
       });
-
-    /*listOfAvailableItems[0] = { "name": "Chocolate cookie", "price": 3, "idwords": ["chocolate", "cookie"] };
-    listOfAvailableItems[1] = { "name": "Pizza Margarita (large)", "price": 19.5, "idwords": ["large", "margarita"] };
-    listOfAvailableItems[2] = { "name": "4 cheese pizza (medium)", "price": 12, "idwords": ["cheese", "four", "medium"] };
-    listOfAvailableItems[3] = { "name": "Coca cola (medium)", "price": 2.5, "idwords": ["cola", "medium", "coca"] };
-    listOfAvailableItems[4] = { "name": "Meatball pizza (medium)", "price": 15, "idwords": ["pizza", "meatball", "medium"] };*/
   }
   else if (req.body.queryResult.intent.displayName == 'orderItems') {
     var contextMatched = false;
