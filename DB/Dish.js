@@ -9,4 +9,4 @@ const dish = mongoose.Schema({
     establishmentId : {type: mongoose.Schema.Types.ObjectId, ref:'Establishment', required: true}
 });
 
-module.exports = Dish = mongoose.model('dish', dish);
+module.exports = mongoose.model('Dish', dish);

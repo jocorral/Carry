@@ -28,7 +28,7 @@ mongoose.connect(URI, {
 );
 
 restService.use(bodyParser.json());
-restService.use(express.json({extended:false}));
+//restService.use(express.json({extended:false}));
 
 
 restService.post("/webhook", function (req, res) {
@@ -489,18 +489,18 @@ restService.post("/webhook", function (req, res) {
         });
       });*/
 
-      Establishment.find()
-        .exec()
-        .then(docs => {
-          return res.json({
-            fulfillmentText: 'This is the information gathered from db ' + JSON.stringify(docs) + ' searched restaurant: '+ restaurant
-          });
-        })
-        .catch(err => {
-          return res.json({
-            fulfillmentText: 'Error took place ' + JSON.stringify(err)
-          });
+    Establishment.findOne({ name: restaurant }, function (err, restaurantExists) {
+      if (restaurantExists) {
+        return res.json({
+          fulfillmentText: 'This is the information gathered from db ' + JSON.stringify(restaurantExists) + ' searched restaurant: ' + restaurant
         });
+      }
+      if (err) {
+        return res.json({
+          fulfillmentText: 'Error took place ' + JSON.stringify(err)
+        });
+      }
+    });
   }
   else if (req.body.queryResult.intent.displayName == 'orderItems') {
     var contextMatched = false;
