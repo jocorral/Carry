@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Pedido = require('../DB/Pedido');
+const Order = require('../DB/Order');
 
 
 router.get('/', (req, res) => {
@@ -9,11 +9,12 @@ router.get('/', (req, res) => {
 
 
 router.post('/', async(req, res) => {
-    const pedido = new Pedido({        
-        precio:req.body.precio,
-        fechaPedidoRealizado:req.body.fechaPedidoRealizado,
-        fechaRecepcionPedido:req.body.fechaRecepcionPedido,
-        valoracion:req.body.valoracion
+    const pedido = new Order({        
+        totalCost : req.body.totalCost,
+        orderDate : req.body.orderDate,
+        orderTime : req.body.orderTime,
+        rating : req.body.rating,
+        userEmail : req.body.userEmail
     });
 
     try{

@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const jwt = require('jsonwebtoken');
 const converter = require('number-to-words');
 const mongoose = require('mongoose');
+const Dish = require('../DB/Dish');
+const Establishment = require('../DB/Establishment');
 
 const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/CarryBD?retryWrites=true&w=majority";
 
@@ -16,8 +18,7 @@ restService.use(
   })
 );
 
-mongoose.connect(URI, { 
-  useMongoClient: true,
+mongoose.connect(URI, {
   useUnifiedTopology: true,
   useNewUrlParser: true 
 }, () =>
@@ -414,11 +415,43 @@ restService.post("/webhook", function (req, res) {
 
     //Query the items that the shop offers to return to the user
     var listOfAvailableItems = [];
-    listOfAvailableItems[0] = { "name": "Chocolate cookie", "price": 3, "idwords": ["chocolate", "cookie"] };
+
+    var eId;
+    Establishment.find().where('name').equals(restaurant).exec()
+    .then(docs =>{
+        docs.forEach(restaurant => {
+            console.log(restaurant.name);
+        });
+        eId = docs[0]._id;
+        console.log(eId);
+        if(eId){
+            Dish.find().where('establishmentId').equals(eId)
+            .exec()
+            .then(docs => {
+                docs.forEach(dish => {
+                  listOfAvailableItems.push({
+                    name : dish.name,
+                    price : dish.price,
+                    idWords : dish.idWords
+                  })
+                });
+            })
+            .catch(err => {
+                console.error('ERROR' ,err);
+                res.status(500).json({ error: 'No establishment found with id ' + eId + ' ' + err });
+            });
+        }   
+    })
+    .catch(err => {
+        console.error('ERROR' ,err);
+        res.status(500).json({ error: 'No establishment found with that name ' + err });
+    }); 
+
+    /*listOfAvailableItems[0] = { "name": "Chocolate cookie", "price": 3, "idwords": ["chocolate", "cookie"] };
     listOfAvailableItems[1] = { "name": "Pizza Margarita (large)", "price": 19.5, "idwords": ["large", "margarita"] };
     listOfAvailableItems[2] = { "name": "4 cheese pizza (medium)", "price": 12, "idwords": ["cheese", "four", "medium"] };
     listOfAvailableItems[3] = { "name": "Coca cola (medium)", "price": 2.5, "idwords": ["cola", "medium", "coca"] };
-    listOfAvailableItems[4] = { "name": "Meatball pizza (medium)", "price": 15, "idwords": ["pizza", "meatball", "medium"] };
+    listOfAvailableItems[4] = { "name": "Meatball pizza (medium)", "price": 15, "idwords": ["pizza", "meatball", "medium"] };*/
     if (listOfAvailableItems.length !== 0) {
       for (let i = 0; i < listOfAvailableItems.length; i++) {
         listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + listOfAvailableItems[i].name + '\n';
@@ -597,7 +630,6 @@ restService.post("/webhook", function (req, res) {
     }
 
   }
-
   else if (req.body.queryResult.intent.displayName == 'moreItemsYes' || req.body.queryResult.intent.displayName == 'moreItemsNo') {
     var contextMatched = false;
     let availableItems;
