@@ -418,7 +418,7 @@ restService.post("/webhook", function (req, res) {
     //Query the items that the shop offers to return to the user
     var listOfAvailableItems = [];
 
-    /*var eId;
+    var eId;
     Establishment.find().where('name').equals(restaurant).exec()
     .then(docs =>{
         docs.forEach(restaurant => {
@@ -447,13 +447,13 @@ restService.post("/webhook", function (req, res) {
     .catch(err => {
         console.error('ERROR' ,err);
         res.status(500).json({ error: 'No establishment found with that name ' + err });
-    });*/
+    });
 
-    listOfAvailableItems[0] = { "name": "Chocolate cookie", "price": 3, "idwords": ["chocolate", "cookie"] };
+    /*listOfAvailableItems[0] = { "name": "Chocolate cookie", "price": 3, "idwords": ["chocolate", "cookie"] };
     listOfAvailableItems[1] = { "name": "Pizza Margarita (large)", "price": 19.5, "idwords": ["large", "margarita"] };
     listOfAvailableItems[2] = { "name": "4 cheese pizza (medium)", "price": 12, "idwords": ["cheese", "four", "medium"] };
     listOfAvailableItems[3] = { "name": "Coca cola (medium)", "price": 2.5, "idwords": ["cola", "medium", "coca"] };
-    listOfAvailableItems[4] = { "name": "Meatball pizza (medium)", "price": 15, "idwords": ["pizza", "meatball", "medium"] };
+    listOfAvailableItems[4] = { "name": "Meatball pizza (medium)", "price": 15, "idwords": ["pizza", "meatball", "medium"] };*/
     if (listOfAvailableItems.length !== 0) {
       for (let i = 0; i < listOfAvailableItems.length; i++) {
         listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + listOfAvailableItems[i].name + '\n';
