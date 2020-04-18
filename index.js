@@ -489,7 +489,7 @@ restService.post("/webhook", function (req, res) {
         });
       });*/
 
-    Establishment.findOne({ name: restaurant }, function (err, restaurantExists) {
+    Establishment.find({ name: restaurant }, function (err, restaurantExists) {
       if (restaurantExists) {
         return res.json({
           fulfillmentText: 'This is the information gathered from db ' + JSON.stringify(restaurantExists) + ' searched restaurant: ' + restaurant
@@ -497,7 +497,9 @@ restService.post("/webhook", function (req, res) {
       }
       if (err) {
         return res.json({
-          fulfillmentText: 'Error took place ' + JSON.stringify(err)
+          speech: 'Something went wrong!',
+          displayText: 'Something went wrong!',
+          source: 'team info'
         });
       }
     });
