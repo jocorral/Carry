@@ -489,10 +489,10 @@ restService.post("/webhook", function (req, res) {
         });
       });*/
 
-    Establishment.find({ error: restaurant }, function (err, restaurantExists) {
+    Establishment.find({}, function (err, restaurantExists) {
       if (restaurantExists) {
         return res.json({
-          fulfillmentText: 'This is the information gathered from db ' + JSON.stringify(restaurantExists) + ' searched restaurant: ' + restaurant
+          fulfillmentText: 'This is the information gathered from database ' + JSON.stringify(restaurantExists) + ' searched restaurant: ' + restaurant
         });
       }
       if (err) {
