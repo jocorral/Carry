@@ -854,12 +854,14 @@ restService.post("/webhook", function (req, res) {
       order.save()
         .then(dbOrder => {
           if (dbOrder._id) {
+            let orderLines = [];
             for (let i = 0; i < selectedItemList.length; i++) {
               const orderLine = new OrderLine({
                 amount: selectedItemList[i].amount,
                 orderId: dbOrder._id,
                 dishId: selectedItemList[i].id
               });
+              orderLines.push(orderLine);
             }
             const orderLineItems = new OrderLineList({
               data: orderLines
