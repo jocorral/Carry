@@ -420,7 +420,7 @@ restService.post("/webhook", function (req, res) {
     //Query the items that the shop offers to return to the user
     var listOfAvailableItems = [];
 
-    var eId;
+    /*var eId;
     Establishment.find().where('name').equals(restaurant).exec()
       .then(docs => {
         if(docs.length != 0){
@@ -487,7 +487,20 @@ restService.post("/webhook", function (req, res) {
         return res.json({
           fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with the name ' + restaurant + ' ' + err
         });
-      });
+      });*/
+
+      Establishment.find()
+        .exec()
+        .then(docs => {
+          return res.json({
+            fulfillmentText: 'This is the information gathered from db ' + JSON.stringify(docs) + ' searched restaurant: '+ restaurant
+          });
+        })
+        .catch(err => {
+          return res.json({
+            fulfillmentText: 'Error took place ' + JSON.stringify(err)
+          });
+        });
   }
   else if (req.body.queryResult.intent.displayName == 'orderItems') {
     var contextMatched = false;
