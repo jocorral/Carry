@@ -451,6 +451,8 @@ restService.post("/webhook", function (req, res) {
                   });
                 }
 
+                let dishes = listOfAvailableItemsStringWritten != '' ? listOfAvailableItemsStringWritten : 'There are no items in this restaurant';
+
                 //Adapt time variable to show only the necesary information
                 var regExTime = /(?<=T)(.*?)(?=\+)/g;
                 var regExDate = /(.*?)(?=T)/g;
@@ -461,9 +463,7 @@ restService.post("/webhook", function (req, res) {
                 // Return response to user
                 return res.json({
                   fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + 
-                    'This restaurant contains the following available items:\n' +
-                     listOfAvailableItemsStringWritten != '' ? listOfAvailableItemsStringWritten : 'There are no items in this restaurant'
-                     + '.',
+                    'This restaurant contains the following available items:\n' + dishes + '.',
                   outputContexts: [
                     {
                       name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
