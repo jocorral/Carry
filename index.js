@@ -460,7 +460,7 @@ restService.post("/webhook", function (req, res) {
                 // Return response to user
                 return res.json({
                   fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + 
-                    'This restaurant contains the following available items (Id words between brackets):\n' + dishes + '.',
+                    'This restaurant contains the following available items (Id words between brackets):\n' + dishes + '.' + JSON.stringify(listOfAvailableItems),
                   outputContexts: [
                     {
                       name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
