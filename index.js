@@ -420,7 +420,7 @@ restService.post("/webhook", function (req, res) {
     //Query the items that the shop offers to return to the user
     var listOfAvailableItems = [];
 
-    /*var eId;
+    var eId;
     Establishment.find().where('name').equals(restaurant).exec()
       .then(docs => {
         if(docs.length != 0){
@@ -443,7 +443,9 @@ restService.post("/webhook", function (req, res) {
                     listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + listOfAvailableItems[i].name + '\n';
                   }
                 } else {
-
+                  return res.json({
+                    fulfillmentText: 'There are no restaurants by the name of ' + restaurant + ' in our database.',
+                  });
                 }
 
                 //Adapt time variable to show only the necesary information
@@ -487,18 +489,7 @@ restService.post("/webhook", function (req, res) {
         return res.json({
           fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with the name ' + restaurant + ' ' + err
         });
-      });*/
-
-    Establishment.findOne().exec().then(data =>{
-      return res.json({
-        fulfillmentText: 'This is the information gathered from database ' + JSON.stringify(data) + ' searched restaurant: ' + restaurant
       });
-    }).catch(error =>{
-      return res.json({
-        speech: 'Something went wrong!',
-        displayText: 'Something went wrong!' + JSON.stringify(error)
-      });
-    });
   }
   else if (req.body.queryResult.intent.displayName == 'orderItems') {
     var contextMatched = false;
