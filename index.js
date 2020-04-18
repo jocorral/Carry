@@ -582,7 +582,8 @@ restService.post("/webhook", function (req, res) {
       //If an item was not selected
       if (selectedItem === null) {
         //Launch error but allow the selection to still be made
-        response = 'An error took place trying to get the indicated item, currently the selected items are the following: ';
+        response = 'An error took place trying to get the indicated item, said words ' + JSON.stringify(wordList) + ' available items ' + JSON.stringify(itemList)+
+        '\n currently the selected items are the following: ';
 
         if (selectedItemList.length === 0) {
           response += 'No item has been selected yet.';
