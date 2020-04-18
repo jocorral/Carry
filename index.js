@@ -415,6 +415,7 @@ restService.post("/webhook", function (req, res) {
       datetime = req.body.queryResult.parameters.time;
     }
 
+    var listOfAvailableItemsStringWritten = '';
     var listOfAvailableItemsString = '';
 
     //Query the items that the shop offers to return to the user
@@ -439,8 +440,10 @@ restService.post("/webhook", function (req, res) {
                 });
 
                 if (listOfAvailableItems.length !== 0) {
+                  listOfAvailableItemsStringWritten = 'Id words to search:'
                   for (let i = 0; i < listOfAvailableItems.length; i++) {
-                    listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + listOfAvailableItems[i].name + '\n';
+                    listOfAvailableItemsString = listOfAvailableItemsString + '\n - ' + listOfAvailableItems[i].name;
+                    listOfAvailableItemsStringWritten = listOfAvailableItemsStringWritten + '\n - ' + listOfAvailableItems[i].name + '(' + listOfAvailableItems[i].idWords +')';
                   }
                 } else {
                   return res.json({
@@ -457,8 +460,10 @@ restService.post("/webhook", function (req, res) {
 
                 // Return response to user
                 return res.json({
-                  fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + // 
-                    'This restaurant contains the following available items:\n' + listOfAvailableItemsString + '.',
+                  fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + 
+                    'This restaurant contains the following available items:\n' +
+                     listOfAvailableItemsStringWritten != '' ? listOfAvailableItemsStringWritten : 'There are no items in this restaurant'
+                     + '.',
                   outputContexts: [
                     {
                       name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
@@ -569,8 +574,8 @@ restService.post("/webhook", function (req, res) {
       //For that, iterate all the items in itemList
       let selectedItem = null;
       itemList.forEach(item => {
-        //If a wordlist includes all the idwords of this specific item, return the item, if not, return null
-        if (item.idwords.every(word => wordList.includes(word))) {
+        //If a wordlist includes all the idWords of this specific item, return the item, if not, return null
+        if (item.idWords.every(word => wordList.includes(word))) {
           selectedItem = item;
         }
       });
