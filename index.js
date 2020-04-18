@@ -460,7 +460,7 @@ restService.post("/webhook", function (req, res) {
                 // Return response to user
                 return res.json({
                   fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + 
-                    'This restaurant contains the following available items (Id words between brackets):\n' + dishes + '.' + JSON.stringify(listOfAvailableItems),
+                    'This restaurant contains the following available items (Id words between brackets):\n' + dishes + '.',
                   outputContexts: [
                     {
                       name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
@@ -740,7 +740,7 @@ restService.post("/webhook", function (req, res) {
         if (selectedItemList.length !== 0) {
           //Calculate total cost
           for (let i = 0; i < selectedItemList.length; i++) {
-            totalCost = totalCost + selectedItemList[i].price;
+            totalCost = totalCost + parseFloat(selectedItemList[i].amount*selectedItemList[i].price, 10).toFixed(2);
             selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name + '\n';
           }
           response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: \n' +
