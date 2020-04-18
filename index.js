@@ -5,8 +5,8 @@ const bodyParser = require("body-parser");
 const jwt = require('jsonwebtoken');
 const converter = require('number-to-words');
 const mongoose = require('mongoose');
-/*const Dish = require('../DB/Dish');
-const Establishment = require('../DB/Establishment');*/
+const Dish = require('../DB/Dish');
+const Establishment = require('../DB/Establishment');
 
 const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/CarryBD?retryWrites=true&w=majority";
 
