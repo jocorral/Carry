@@ -425,16 +425,16 @@ restService.post("/webhook", function (req, res) {
     var eId;
     Establishment.find().where('name').equals(restaurant).exec()
       .then(docs => {
-        if(docs.length != 0){
+        if (docs.length != 0) {
           eId = docs[0]._id;
-          
+
           if (eId) {
             Dish.find().where('establishmentId').equals(eId)
               .exec()
               .then(docs => {
                 docs.forEach(dish => {
                   listOfAvailableItems.push({
-                    "id" : dish._id,
+                    "id": dish._id,
                     "name": dish.name,
                     "price": dish.price,
                     "idwords": dish.idWords
@@ -443,7 +443,7 @@ restService.post("/webhook", function (req, res) {
 
                 if (listOfAvailableItems.length !== 0) {
                   for (let i = 0; i < listOfAvailableItems.length; i++) {
-                    listOfAvailableItemsStringWritten = listOfAvailableItemsStringWritten + '\n - ' + listOfAvailableItems[i].name + '(' + listOfAvailableItems[i].idwords +')';
+                    listOfAvailableItemsStringWritten = listOfAvailableItemsStringWritten + '\n - ' + listOfAvailableItems[i].name + '(' + listOfAvailableItems[i].idwords + ')';
                   }
                 } else {
                   return res.json({
@@ -462,7 +462,7 @@ restService.post("/webhook", function (req, res) {
 
                 // Return response to user
                 return res.json({
-                  fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + 
+                  fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' +
                     'This restaurant contains the following available items (Id words between brackets):\n' + dishes + '.',
                   outputContexts: [
                     {
@@ -485,7 +485,7 @@ restService.post("/webhook", function (req, res) {
                 });
               });
           }
-        }else{
+        } else {
           return res.json({
             fulfillmentText: 'No establishment found with the name of ' + restaurant + ' ' + JSON.stringify(docs)
           });
@@ -594,8 +594,8 @@ restService.post("/webhook", function (req, res) {
       //If an item was not selected
       if (selectedItem === null) {
         //Launch error but allow the selection to still be made
-        response = 'An error took place trying to get the indicated item, said words ' + JSON.stringify(wordList) + ' available items ' + JSON.stringify(itemList)+
-        '\n currently the selected items are the following: ';
+        response = 'An error took place trying to get the indicated item, said words ' + JSON.stringify(wordList) + ' available items ' + JSON.stringify(itemList) +
+          '\n currently the selected items are the following: ';
 
         if (selectedItemList.length === 0) {
           response += 'No item has been selected yet.';
@@ -725,13 +725,13 @@ restService.post("/webhook", function (req, res) {
 
         let selectedItemListStr = '';
         for (let i = 0; i < selectedItemList.length; i++) {
-          selectedItemListStr += selectedItemList[i].amount + '\n'+ ' - ' + selectedItemList[i].name;
+          selectedItemListStr += selectedItemList[i].amount + '\n' + ' - ' + selectedItemList[i].name;
         }
 
         //Return to previous context with the restaurant related + datetime related + selected items info
         return res.json({
           fulfillmentText: 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items so far: ' +
-            selectedItemListStr + '. \n'+'Which one of the following list would you like to add to them? \n' + listOfAvailableItemsString,
+            selectedItemListStr + '. \n' + 'Which one of the following list would you like to add to them? \n' + listOfAvailableItemsString,
           outputContexts: [
             {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
@@ -758,7 +758,7 @@ restService.post("/webhook", function (req, res) {
         if (selectedItemList.length !== 0) {
           //Calculate total cost
           for (let i = 0; i < selectedItemList.length; i++) {
-            totalCost = (parseFloat(totalCost) + parseFloat(selectedItemList[i].amount*selectedItemList[i].price, 10)).toFixed(2);
+            totalCost = (parseFloat(totalCost) + parseFloat(selectedItemList[i].amount * selectedItemList[i].price, 10)).toFixed(2);
             selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name + '\n';
           }
           response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: \n' +
@@ -839,50 +839,50 @@ restService.post("/webhook", function (req, res) {
       }
     });
 
-    if(contextMatched){
+    if (contextMatched) {
       //Save all the information in db
       const order = new Order({
-        totalCost : totalCost,
-        orderDate : date,
-        orderTime : time,
-        orderDatetime : date+'T'+time,
-        rating : 0,
-        userEmail : userInformationJSON.email,
-        status : 'Active',
-        establishmentId : restaurantId
+        totalCost: totalCost,
+        orderDate: date,
+        orderTime: time,
+        orderDatetime: date + 'T' + time,
+        rating: 0,
+        userEmail: userInformationJSON.email,
+        status: 'Active',
+        establishmentId: restaurantId
       });
       order.save()
-          .then(dbOrder =>{
-              if(dbOrder._id){
-                for(let i = 0; i<selectedItemList.length; i++){
-                  const orderLine = new OrderLine({
-                    amount : selectedItemList[i].amount,
-                    orderId : dbOrder._id,
-                    dishId : selectedItemList[i].id
-                  });
-
-                  orderLine.save().then(dbOrderLine => {
-                    return res.json({
-                      //data: speechResponse,
-                      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. You just paid ' + totalCost + '€ in ' + restaurant + ' with id ' + restaurantId,
-                      speech: speech,
-                      displayText: speech,
-                      source: "webhook-echo-sample"
-                    });
-                  }).catch(e =>{
-                    return res.json({
-                      fulfillmentText: 'Error took place while creating the order lines: ' + JSON.stringify(e)
-                    });
-                  });
-                }
-              }
-          })
-          .catch(error =>{
-            return res.json({
-              fulfillmentText: 'Error took place while creating the order: ' + JSON.stringify(error)
+        .then(dbOrder => {
+          if (dbOrder._id) {
+            for (let i = 0; i < selectedItemList.length; i++) {
+              const orderLine = new OrderLine({
+                amount: selectedItemList[i].amount,
+                orderId: dbOrder._id,
+                dishId: selectedItemList[i].id
+              });
+            }
+            const orderLineItems = new OrderLineList({
+              data: orderLines
             });
+
+            orderLineItems.save()
+              .then(dbOrderLineList => {
+                return res.json({
+                  fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. You just paid ' + totalCost + '€ in ' + restaurant + ' with id ' + restaurantId
+                });
+              }).catch(e => {
+                return res.json({
+                  fulfillmentText: 'Error took place while creating the order lines: ' + JSON.stringify(e)
+                });
+              });
+          }
+        })
+        .catch(error => {
+          return res.json({
+            fulfillmentText: 'Error took place while creating the order: ' + JSON.stringify(error)
           });
-    }else{
+        });
+    } else {
       return res.json({
         fulfillmentText: 'It seems that an error took place trynig to recover the paying information.'
       });

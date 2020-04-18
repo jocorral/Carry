@@ -6,4 +6,4 @@ const orderLine = mongoose.Schema({
     dishId : {type: mongoose.Schema.Types.ObjectId, ref:'Dish', required: true}
 });
 
-module.exports = OrderLine = mongoose.model('orderLine', orderLine);
+module.exports = mongoose.model('OrderLine', orderLine);
