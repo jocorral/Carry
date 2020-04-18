@@ -847,6 +847,7 @@ restService.post("/webhook", function (req, res) {
         orderDatetime : date+'T'+time,
         rating : 0,
         userEmail : userInformationJSON.email,
+        status : 'Active',
         establishmentId : restaurantId
       });
       order.save()
