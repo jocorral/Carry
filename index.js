@@ -489,7 +489,7 @@ restService.post("/webhook", function (req, res) {
         });
       });*/
 
-    Establishment.find().exec().then(data =>{
+    Establishment.findOne().exec().then(data =>{
       return res.json({
         fulfillmentText: 'This is the information gathered from database ' + JSON.stringify(data) + ' searched restaurant: ' + restaurant
       });
