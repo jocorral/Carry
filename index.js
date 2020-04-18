@@ -416,7 +416,6 @@ restService.post("/webhook", function (req, res) {
     }
 
     var listOfAvailableItemsStringWritten = '';
-    var listOfAvailableItemsString = '';
 
     //Query the items that the shop offers to return to the user
     var listOfAvailableItems = [];
@@ -440,9 +439,7 @@ restService.post("/webhook", function (req, res) {
                 });
 
                 if (listOfAvailableItems.length !== 0) {
-                  listOfAvailableItemsStringWritten = 'Id words to search:'
                   for (let i = 0; i < listOfAvailableItems.length; i++) {
-                    listOfAvailableItemsString = listOfAvailableItemsString + '\n - ' + listOfAvailableItems[i].name;
                     listOfAvailableItemsStringWritten = listOfAvailableItemsStringWritten + '\n - ' + listOfAvailableItems[i].name + '(' + listOfAvailableItems[i].idwords +')';
                   }
                 } else {
@@ -463,7 +460,7 @@ restService.post("/webhook", function (req, res) {
                 // Return response to user
                 return res.json({
                   fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + 
-                    'This restaurant contains the following available items:\n' + dishes + '.',
+                    'This restaurant contains the following available items (Id words between brackets):\n' + dishes + '.',
                   outputContexts: [
                     {
                       name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
