@@ -554,6 +554,9 @@ restService.post("/webhook", function (req, res) {
         else if (wordList[i].toLowerCase() === 'smoothies') {
           wordList[i] = 'smoothie';
         }
+        else if (wordList[i].toLowerCase() === 'peperoni') {
+          wordList[i] = 'peperoni';
+        }
         else {
           //If it's a number, transform it into a word
           if (!isNaN(wordList[i])) {
