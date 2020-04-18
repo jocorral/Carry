@@ -871,7 +871,7 @@ restService.post("/webhook", function (req, res) {
             orderLineItems.save()
               .then(dbOrderLineList => {
                 return res.json({
-                  fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. You just paid ' + totalCost + '€ in ' + restaurant + ' with id ' + restaurantId
+                  fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. '
                 });
               }).catch(e => {
                 return res.json({
