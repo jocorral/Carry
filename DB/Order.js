@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const order = mongoose.Schema({
-    _id : mongoose.Schema.Types.ObjectId,
+    //_id : mongoose.Schema.Types.ObjectId,
     totalCost : Number,
     orderDate : Date,
     orderTime : String,
