@@ -41,6 +41,7 @@ router.get('/:establishmentName', (req, res, next) => {
 
     Establishment.find().where('name').equals(eName).exec()
     .then(docs =>{
+        console.log(eName);
         docs.forEach(restaurant => {
             console.log(restaurant.name);
         });

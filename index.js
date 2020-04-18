@@ -28,6 +28,8 @@ mongoose.connect(URI, {
 );
 
 restService.use(bodyParser.json());
+restService.use(express.json({extended:false}));
+
 
 restService.post("/webhook", function (req, res) {
   var PROJECT_ID = 'carry-lajhni';
