@@ -6,6 +6,7 @@ const order = mongoose.Schema({
     orderTime : String,
     rating : Number,
     userEmail : String,
+    status : String,
     establishmentId : {type: mongoose.Schema.Types.ObjectId, ref:'Establishment', required: true}
 });
 

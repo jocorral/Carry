@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const converter = require('number-to-words');
 const mongoose = require('mongoose');
 const Dish = require('./DB/Dish');
+const Order = require('./DB/Order');
 const Establishment = require('./DB/Establishment');
 
 const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
@@ -425,7 +426,7 @@ restService.post("/webhook", function (req, res) {
       .then(docs => {
         if(docs.length != 0){
           eId = docs[0]._id;
-          console.log(eId);
+          
           if (eId) {
             Dish.find().where('establishmentId').equals(eId)
               .exec()
@@ -467,6 +468,7 @@ restService.post("/webhook", function (req, res) {
                       name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
                       lifespanCount: 7,
                       parameters: {
+                        "restaurantId": eId,
                         "restaurant": restaurant,
                         "date": date,
                         "time": timeWithoutSeconds,
@@ -498,6 +500,7 @@ restService.post("/webhook", function (req, res) {
     var contextMatched = false;
     var itemList;
     var selectedItemList = [];
+    var restaurantId;
     var restaurant;
     var date;
     var time;
@@ -511,6 +514,10 @@ restService.post("/webhook", function (req, res) {
         if (context.parameters.availableItems) {
           //Assign variable to the active order list
           itemList = context.parameters.availableItems;
+        }
+        if (context.parameters.restaurantId) {
+          //Assign variable to the active order list
+          restaurantId = context.parameters.restaurantId;
         }
         if (context.parameters.restaurant) {
           //Assign variable to the active order list
@@ -606,6 +613,7 @@ restService.post("/webhook", function (req, res) {
               lifespanCount: 2,
               parameters: {
                 "selectedItems": selectedItemList,
+                "restaurantId": restaurantId,
                 "restaurant": restaurant,
                 "date": date,
                 "time": time,
@@ -632,6 +640,7 @@ restService.post("/webhook", function (req, res) {
               lifespanCount: 2,
               parameters: {
                 "selectedItems": selectedItemList,
+                "restaurantId": restaurantId,
                 "restaurant": restaurant,
                 "date": date,
                 "time": time,
@@ -649,6 +658,7 @@ restService.post("/webhook", function (req, res) {
     var contextMatched = false;
     let availableItems;
     let selectedItemList = [];
+    let selectedRestaurantId;
     let selectedRestaurant;
     let specifiedDate;
     let specifiedTime;
@@ -675,6 +685,11 @@ restService.post("/webhook", function (req, res) {
         if (context.parameters.restaurant) {
           //Assign variable to the active order list
           selectedRestaurant = context.parameters.restaurant;
+        }
+        //Get its id
+        if (context.parameters.restaurantId) {
+          //Assign variable to the active order list
+          selectedRestaurantId = context.parameters.restaurantId;
         }
 
         //Find if the date exists
@@ -709,18 +724,19 @@ restService.post("/webhook", function (req, res) {
 
         let selectedItemListStr = '';
         for (let i = 0; i < selectedItemList.length; i++) {
-          selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name + '\n';
+          selectedItemListStr += selectedItemList[i].amount + '\n'+ ' - ' + selectedItemList[i].name;
         }
 
         //Return to previous context with the restaurant related + datetime related + selected items info
         return res.json({
           fulfillmentText: 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items so far: ' +
-            selectedItemListStr + '. Which one of the following list would you like to add to them? \n' + listOfAvailableItemsString,
+            selectedItemListStr + '. \n'+'Which one of the following list would you like to add to them? \n' + listOfAvailableItemsString,
           outputContexts: [
             {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
               lifespanCount: 7,
               parameters: {
+                "restaurantId": selectedRestaurantId,
                 "restaurant": selectedRestaurant,
                 "date": specifiedDate,
                 "time": specifiedTime,
@@ -745,7 +761,7 @@ restService.post("/webhook", function (req, res) {
             selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name + '\n';
           }
           response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: \n' +
-            selectedItemListStr + '.\n The total cost of this operation is ' + totalCost + '€. This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
+            selectedItemListStr + '\n The total cost of this operation is ' + totalCost + '€. This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
             'Card number, the month when the validity of the card ends and the CVC code (which you can find behind your card).'
         } else {
           response = 'No item was selected, no order can be placed.';
@@ -760,6 +776,7 @@ restService.post("/webhook", function (req, res) {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_payment",
               lifespanCount: 5,
               parameters: {
+                "restaurantId": selectedRestaurantId,
                 "restaurant": selectedRestaurant,
                 "date": specifiedDate,
                 "time": specifiedTime,
@@ -788,6 +805,7 @@ restService.post("/webhook", function (req, res) {
     //TODO save it in mongo
     var contextMatched = false;
     let restaurant;
+    let restaurantId;
     let date;
     let time;
     let selectedItemList = [];
@@ -799,6 +817,9 @@ restService.post("/webhook", function (req, res) {
       if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_payment") {
         contextMatched = true;
         // Recover the list of attributes from context
+        if (context.parameters.restaurantId) {
+          restaurantId = context.parameters.restaurantId;
+        }
         if (context.parameters.restaurant) {
           restaurant = context.parameters.restaurant;
         }
@@ -814,19 +835,44 @@ restService.post("/webhook", function (req, res) {
         if (context.parameters.totalCost) {
           totalCost = context.parameters.totalCost;
         }
-
       }
     });
 
     if(contextMatched){
-      
+      //Save all the information in db
+      const order = new Order({        
+        totalCost : totalCost,
+        orderDate : date,
+        orderTime : time,
+        rating : 0,
+        userEmail : req.body.userEmail
+      });
+      plato.save()
+          .then( data =>{
+              console.log(data)
+              res.status(201).json({
+                  message: 'Dish was created',
+                  createdDish : data
+              })
+          })
+          .catch(error =>{
+              console.log(error);
+              res.status(500).json({
+                  message: 'Dish with error',
+                  error : error
+              });
+          });
+    }else{
+      return res.json({
+        fulfillmentText: 'It seems that an error took place trynig to recover the paying information.'
+      });
     }
     //Call external API and make payment
     //Call external API to send an email
 
     return res.json({
       //data: speechResponse,
-      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. You just paid ' + totalCost,
+      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. You just paid ' + totalCost + '€ in ' + restaurant + ' with id ' + restaurantId,
       speech: speech,
       displayText: speech,
       source: "webhook-echo-sample"
