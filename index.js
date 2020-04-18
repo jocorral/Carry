@@ -740,7 +740,7 @@ restService.post("/webhook", function (req, res) {
         if (selectedItemList.length !== 0) {
           //Calculate total cost
           for (let i = 0; i < selectedItemList.length; i++) {
-            totalCost = totalCost + parseFloat(selectedItemList[i].amount*selectedItemList[i].price, 10).toFixed(2);
+            totalCost = totalCost + (selectedItemList[i].amount*selectedItemList[i].price).toFixed(2);
             selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name + '\n';
           }
           response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: \n' +
