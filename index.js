@@ -844,6 +844,7 @@ restService.post("/webhook", function (req, res) {
         totalCost : totalCost,
         orderDate : date,
         orderTime : time,
+        orderDatetime : date+'T'+time,
         rating : 0,
         userEmail : userInformationJSON.email,
         establishmentId : restaurantId

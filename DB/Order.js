@@ -2,8 +2,9 @@ const mongoose = require('mongoose');
 const order = mongoose.Schema({
     //_id : mongoose.Schema.Types.ObjectId,
     totalCost : Number,
-    orderDate : Date,
+    orderDate : String,
     orderTime : String,
+    orderDatetime : Date,
     rating : Number,
     userEmail : String,
     status : String,
