@@ -477,7 +477,7 @@ restService.post("/webhook", function (req, res) {
           }
         }else{
           return res.json({
-            fulfillmentText: 'No establishment found with with that name ' + JSON.stringify(docs)
+            fulfillmentText: 'No establishment found with the name of' + restaurant + ' ' + JSON.stringify(docs)
           });
         }
       })
