@@ -840,28 +840,45 @@ restService.post("/webhook", function (req, res) {
 
     if(contextMatched){
       //Save all the information in db
-      const order = new Order({        
+      const order = new Order({
         totalCost : totalCost,
         orderDate : date,
         orderTime : time,
         rating : 0,
-        userEmail : req.body.userEmail
+        userEmail : userInformationJSON.email,
+        establishmentId : restaurantId
       });
-      /*plato.save()
-          .then( data =>{
-              console.log(data)
-              res.status(201).json({
-                  message: 'Dish was created',
-                  createdDish : data
-              })
+      order.save()
+          .then(dbOrder =>{
+              if(dbOrder._id){
+                for(let i = 0; i<selectedItemList.length; i++){
+                  const orderLine = new OrderLine({
+                    amount : selectedItemList[i].amount,
+                    orderId : dbOrder._id,
+                    dishId : selectedItemList[i].id
+                  });
+
+                  orderLine.save().then(dbOrderLine => {
+                    return res.json({
+                      //data: speechResponse,
+                      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. You just paid ' + totalCost + '€ in ' + restaurant + ' with id ' + restaurantId,
+                      speech: speech,
+                      displayText: speech,
+                      source: "webhook-echo-sample"
+                    });
+                  }).catch(e =>{
+                    return res.json({
+                      fulfillmentText: 'Error took place while creating the order lines: ' + JSON.stringify(e)
+                    });
+                  });
+                }
+              }
           })
           .catch(error =>{
-              console.log(error);
-              res.status(500).json({
-                  message: 'Dish with error',
-                  error : error
-              });
-          });*/
+            return res.json({
+              fulfillmentText: 'Error took place while creating the order: ' + JSON.stringify(error)
+            });
+          });
     }else{
       return res.json({
         fulfillmentText: 'It seems that an error took place trynig to recover the paying information.'
@@ -869,14 +886,6 @@ restService.post("/webhook", function (req, res) {
     }
     //Call external API and make payment
     //Call external API to send an email
-
-    return res.json({
-      //data: speechResponse,
-      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. You just paid ' + totalCost + '€ in ' + restaurant + ' with id ' + restaurantId,
-      speech: speech,
-      displayText: speech,
-      source: "webhook-echo-sample"
-    });
   }
   /* PAYMENT - END */
 
