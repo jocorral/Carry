@@ -489,19 +489,15 @@ restService.post("/webhook", function (req, res) {
         });
       });*/
 
-    Establishment.find({}, function (err, restaurantExists) {
-      if (restaurantExists) {
-        return res.json({
-          fulfillmentText: 'This is the information gathered from database ' + JSON.stringify(restaurantExists) + ' searched restaurant: ' + restaurant
-        });
-      }
-      if (err) {
-        return res.json({
-          speech: 'Something went wrong!',
-          displayText: 'Something went wrong!',
-          source: 'team info'
-        });
-      }
+    Establishment.find().exec().then(data =>{
+      return res.json({
+        fulfillmentText: 'This is the information gathered from database ' + JSON.stringify(data) + ' searched restaurant: ' + restaurant
+      });
+    }).catch(error =>{
+      return res.json({
+        speech: 'Something went wrong!',
+        displayText: 'Something went wrong!' + JSON.stringify(error)
+      });
     });
   }
   else if (req.body.queryResult.intent.displayName == 'orderItems') {
