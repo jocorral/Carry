@@ -421,61 +421,64 @@ restService.post("/webhook", function (req, res) {
     var eId;
     Establishment.find().where('name').equals(restaurant).exec()
       .then(docs => {
-        docs.forEach(restaurant => {
-          console.log(restaurant.name);
-        });
-        eId = docs[0]._id;
-        console.log(eId);
-        if (eId) {
-          Dish.find().where('establishmentId').equals(eId)
-            .exec()
-            .then(docs => {
-              docs.forEach(dish => {
-                listOfAvailableItems.push({
-                  name: dish.name,
-                  price: dish.price,
-                  idWords: dish.idWords
-                })
-              });
+        if(docs.length != 0){
+          eId = docs[0]._id;
+          console.log(eId);
+          if (eId) {
+            Dish.find().where('establishmentId').equals(eId)
+              .exec()
+              .then(docs => {
+                docs.forEach(dish => {
+                  listOfAvailableItems.push({
+                    name: dish.name,
+                    price: dish.price,
+                    idWords: dish.idWords
+                  })
+                });
 
-              if (listOfAvailableItems.length !== 0) {
-                for (let i = 0; i < listOfAvailableItems.length; i++) {
-                  listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + listOfAvailableItems[i].name + '\n';
-                }
-              } else {
-
-              }
-
-              //Adapt time variable to show only the necesary information
-              var regExTime = /(?<=T)(.*?)(?=\+)/g;
-              var regExDate = /(.*?)(?=T)/g;
-              let time = regExTime.exec(datetime)[0];
-              let timeWithoutSeconds = time.substring(0, time.length - 3);
-              let date = regExDate.exec(datetime)[0];
-
-              // Return response to user
-              return res.json({
-                fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + // 
-                  'This restaurant contains the following available items:\n' + listOfAvailableItemsString + '.',
-                outputContexts: [
-                  {
-                    name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
-                    lifespanCount: 7,
-                    parameters: {
-                      "restaurant": restaurant,
-                      "date": date,
-                      "time": timeWithoutSeconds,
-                      "availableItems": listOfAvailableItems
-                    }
+                if (listOfAvailableItems.length !== 0) {
+                  for (let i = 0; i < listOfAvailableItems.length; i++) {
+                    listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + listOfAvailableItems[i].name + '\n';
                   }
-                ]
+                } else {
+
+                }
+
+                //Adapt time variable to show only the necesary information
+                var regExTime = /(?<=T)(.*?)(?=\+)/g;
+                var regExDate = /(.*?)(?=T)/g;
+                let time = regExTime.exec(datetime)[0];
+                let timeWithoutSeconds = time.substring(0, time.length - 3);
+                let date = regExDate.exec(datetime)[0];
+
+                // Return response to user
+                return res.json({
+                  fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + // 
+                    'This restaurant contains the following available items:\n' + listOfAvailableItemsString + '.',
+                  outputContexts: [
+                    {
+                      name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
+                      lifespanCount: 7,
+                      parameters: {
+                        "restaurant": restaurant,
+                        "date": date,
+                        "time": timeWithoutSeconds,
+                        "availableItems": listOfAvailableItems
+                      }
+                    }
+                  ]
+                });
+              })
+              .catch(err => {
+                return res.json({
+                  fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with id ' + eId + ' ' + err
+                });
               });
-            })
-            .catch(err => {
-              return res.json({
-                fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with id ' + eId + ' ' + err
-              });
-            });
+          }
+        }else{
+          return res.json({
+            fulfillmentText: 'No establishment found with with that name ' + JSON.stringify(docs)
+          });
         }
       })
       .catch(err => {
