@@ -881,7 +881,7 @@ restService.post("/webhook", function (req, res) {
         })
         .catch(error => {
           return res.json({
-            fulfillmentText: 'Error took place while creating the order: ' + JSON.stringify(error)
+            fulfillmentText: 'Error took place while creating the order: ' + JSON.stringify(selectedItemList)
           });
         });
     } else {
