@@ -432,6 +432,7 @@ restService.post("/webhook", function (req, res) {
               .then(docs => {
                 docs.forEach(dish => {
                   listOfAvailableItems.push({
+                    "id" : dish._id,
                     "name": dish.name,
                     "price": dish.price,
                     "idwords": dish.idWords
@@ -621,7 +622,7 @@ restService.post("/webhook", function (req, res) {
           specifiedAmount = req.body.queryResult.parameters.amount;
         }
 
-        selectedItemList.push({ "amount": specifiedAmount, "name": selectedItem.name, "price": selectedItem.price });
+        selectedItemList.push({ "amount": specifiedAmount, "id": selectedItem.id, "name": selectedItem.name, "price": selectedItem.price });
 
         return res.json({
           fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', would you like to add any other item to this order?',
@@ -763,7 +764,8 @@ restService.post("/webhook", function (req, res) {
                 "date": specifiedDate,
                 "time": specifiedTime,
                 "availableItems": availableItems,
-                "selectedItems": selectedItemList
+                "selectedItems": selectedItemList,
+                "totalCost": totalCost
               }
             }
           ]
@@ -784,12 +786,47 @@ restService.post("/webhook", function (req, res) {
     var saveCreditCard = false;
 
     //TODO save it in mongo
+    var contextMatched = false;
+    let restaurant;
+    let date;
+    let time;
+    let selectedItemList = [];
+    let totalCost;
+
+    //Recover the list of active orders from context
+    req.body.queryResult.outputContexts.forEach(context => {
+      //The context of order items followup will contain selected Items
+      if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_payment") {
+        contextMatched = true;
+        // Recover the list of attributes from context
+        if (context.parameters.restaurant) {
+          restaurant = context.parameters.restaurant;
+        }
+        if (context.parameters.date) {
+          date = context.parameters.date;
+        }
+        if (context.parameters.time) {
+          time = context.parameters.time;
+        }
+        if (context.parameters.selectedItems) {
+          selectedItemList = context.parameters.selectedItems;
+        }
+        if (context.parameters.totalCost) {
+          totalCost = context.parameters.totalCost;
+        }
+
+      }
+    });
+
+    if(contextMatched){
+      
+    }
     //Call external API and make payment
     //Call external API to send an email
 
     return res.json({
       //data: speechResponse,
-      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction.',
+      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. You just paid ' + totalCost,
       speech: speech,
       displayText: speech,
       source: "webhook-echo-sample"
