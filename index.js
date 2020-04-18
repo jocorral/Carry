@@ -443,7 +443,7 @@ restService.post("/webhook", function (req, res) {
                   listOfAvailableItemsStringWritten = 'Id words to search:'
                   for (let i = 0; i < listOfAvailableItems.length; i++) {
                     listOfAvailableItemsString = listOfAvailableItemsString + '\n - ' + listOfAvailableItems[i].name;
-                    listOfAvailableItemsStringWritten = listOfAvailableItemsStringWritten + '\n - ' + listOfAvailableItems[i].name + '(' + listOfAvailableItems[i].idWords +')';
+                    listOfAvailableItemsStringWritten = listOfAvailableItemsStringWritten + '\n - ' + listOfAvailableItems[i].name + '(' + listOfAvailableItems[i].idwords +')';
                   }
                 } else {
                   return res.json({
