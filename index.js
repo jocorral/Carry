@@ -847,7 +847,7 @@ restService.post("/webhook", function (req, res) {
         rating : 0,
         userEmail : req.body.userEmail
       });
-      plato.save()
+      /*plato.save()
           .then( data =>{
               console.log(data)
               res.status(201).json({
@@ -861,7 +861,7 @@ restService.post("/webhook", function (req, res) {
                   message: 'Dish with error',
                   error : error
               });
-          });
+          });*/
     }else{
       return res.json({
         fulfillmentText: 'It seems that an error took place trynig to recover the paying information.'
