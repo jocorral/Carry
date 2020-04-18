@@ -22,7 +22,7 @@ mongoose.connect(URI, {
   useMongoClient: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
-  useNewUrlParser: true 
+  useNewUrlParser: true
 }, () =>
   console.log('Carry cluster in Mongodb has been reached')
 );
@@ -123,7 +123,7 @@ restService.post("/webhook", function (req, res) {
         else if (
           req.body.queryResult.parameters.selectedAction.includes('to make') ||
           req.body.queryResult.parameters.selectedAction.includes('to place') ||
-          req.body.queryResult.parameters.selectedAction.includes('to order')||
+          req.body.queryResult.parameters.selectedAction.includes('to order') ||
           req.body.queryResult.parameters.selectedAction.includes('to create')
         ) {
           //If an order wants to be cancelled, the context is set to cancelation
@@ -420,72 +420,75 @@ restService.post("/webhook", function (req, res) {
 
     var eId;
     Establishment.find().where('name').equals(restaurant).exec()
-    .then(docs =>{
+      .then(docs => {
         docs.forEach(restaurant => {
-            console.log(restaurant.name);
+          console.log(restaurant.name);
         });
         eId = docs[0]._id;
         console.log(eId);
-        if(eId){
-            Dish.find().where('establishmentId').equals(eId)
+        if (eId) {
+          Dish.find().where('establishmentId').equals(eId)
             .exec()
             .then(docs => {
-                docs.forEach(dish => {
-                  listOfAvailableItems.push({
-                    name : dish.name,
-                    price : dish.price,
-                    idWords : dish.idWords
-                  })
-                });
+              docs.forEach(dish => {
+                listOfAvailableItems.push({
+                  name: dish.name,
+                  price: dish.price,
+                  idWords: dish.idWords
+                })
+              });
+
+              if (listOfAvailableItems.length !== 0) {
+                for (let i = 0; i < listOfAvailableItems.length; i++) {
+                  listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + listOfAvailableItems[i].name + '\n';
+                }
+              } else {
+
+              }
+
+              //Adapt time variable to show only the necesary information
+              var regExTime = /(?<=T)(.*?)(?=\+)/g;
+              var regExDate = /(.*?)(?=T)/g;
+              let time = regExTime.exec(datetime)[0];
+              let timeWithoutSeconds = time.substring(0, time.length - 3);
+              let date = regExDate.exec(datetime)[0];
+
+              // Return response to user
+              return res.json({
+                fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + // 
+                  'This restaurant contains the following available items:\n' + listOfAvailableItemsString + '.',
+                outputContexts: [
+                  {
+                    name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
+                    lifespanCount: 7,
+                    parameters: {
+                      "restaurant": restaurant,
+                      "date": date,
+                      "time": timeWithoutSeconds,
+                      "availableItems": listOfAvailableItems
+                    }
+                  }
+                ]
+              });
             })
             .catch(err => {
-                console.error('ERROR' ,err);
-                res.status(500).json({ error: 'No establishment found with id ' + eId + ' ' + err });
+              return res.json({
+                fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with id ' + eId + ' ' + err
+              });
             });
-        }   
-    })
-    .catch(err => {
-        console.error('ERROR' ,err);
-        res.status(500).json({ error: 'No establishment found with that name ' + err });
-    });
+        }
+      })
+      .catch(err => {
+        return res.json({
+          fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with with that name ' + err
+        });
+      });
 
     /*listOfAvailableItems[0] = { "name": "Chocolate cookie", "price": 3, "idwords": ["chocolate", "cookie"] };
     listOfAvailableItems[1] = { "name": "Pizza Margarita (large)", "price": 19.5, "idwords": ["large", "margarita"] };
     listOfAvailableItems[2] = { "name": "4 cheese pizza (medium)", "price": 12, "idwords": ["cheese", "four", "medium"] };
     listOfAvailableItems[3] = { "name": "Coca cola (medium)", "price": 2.5, "idwords": ["cola", "medium", "coca"] };
     listOfAvailableItems[4] = { "name": "Meatball pizza (medium)", "price": 15, "idwords": ["pizza", "meatball", "medium"] };*/
-    if (listOfAvailableItems.length !== 0) {
-      for (let i = 0; i < listOfAvailableItems.length; i++) {
-        listOfAvailableItemsString = listOfAvailableItemsString + ' - ' + listOfAvailableItems[i].name + '\n';
-      }
-    }else{
-
-    }
-
-    //Adapt time variable to show only the necesary information
-    var regExTime = /(?<=T)(.*?)(?=\+)/g;
-    var regExDate = /(.*?)(?=T)/g;
-    let time = regExTime.exec(datetime)[0];
-    let timeWithoutSeconds = time.substring(0, time.length - 3);
-    let date = regExDate.exec(datetime)[0];
-
-    // Return response to user
-    return res.json({
-      fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' + // 
-        'This restaurant contains the following available items:\n' + listOfAvailableItemsString + '.',
-      outputContexts: [
-        {
-          name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
-          lifespanCount: 7,
-          parameters: {
-            "restaurant": restaurant,
-            "date": date,
-            "time": timeWithoutSeconds,
-            "availableItems": listOfAvailableItems
-          }
-        }
-      ]
-    });
   }
   else if (req.body.queryResult.intent.displayName == 'orderItems') {
     var contextMatched = false;
@@ -518,7 +521,7 @@ restService.post("/webhook", function (req, res) {
           date = context.parameters.date;
         }
         // Recover the list of previously selected items and push this item to the list
-        if(context.parameters.selectedItems){
+        if (context.parameters.selectedItems) {
           //Get all the previously selected items in a variable
           selectedItemList = context.parameters.selectedItems;
         }
@@ -539,26 +542,26 @@ restService.post("/webhook", function (req, res) {
         es: '',
         s: ''
       };
-      
-      for(let i = 0; i<wordList.length; i++){
-          //Irregular cases
-          if(wordList[i].toLowerCase() === 'cookies'){
-            wordList[i] = 'cookie';
-          }
-          else if(wordList[i].toLowerCase() === 'smoothies'){
-            wordList[i] = 'smoothie';
-          }
-          else{
-            //If it's a number, transform it into a word
-            if(!isNaN(wordList[i])){
-              let num = parseInt(wordList[i]);
-              wordList[i] = converter.toWords(num).toLowerCase();
-            }else{
-              wordList[i] = wordList[i].replace(
+
+      for (let i = 0; i < wordList.length; i++) {
+        //Irregular cases
+        if (wordList[i].toLowerCase() === 'cookies') {
+          wordList[i] = 'cookie';
+        }
+        else if (wordList[i].toLowerCase() === 'smoothies') {
+          wordList[i] = 'smoothie';
+        }
+        else {
+          //If it's a number, transform it into a word
+          if (!isNaN(wordList[i])) {
+            let num = parseInt(wordList[i]);
+            wordList[i] = converter.toWords(num).toLowerCase();
+          } else {
+            wordList[i] = wordList[i].replace(
               new RegExp(`(${Object.keys(endings).join('|')})$`),
               r => endings[r]).toLowerCase();
-            }
           }
+        }
       }
 
       //Check if the selected items are between the available options
@@ -578,10 +581,10 @@ restService.post("/webhook", function (req, res) {
         //Launch error but allow the selection to still be made
         response = 'An error took place trying to get the indicated item, currently the selected items are the following: ';
 
-        if(selectedItemList.length === 0){
+        if (selectedItemList.length === 0) {
           response += 'No item has been selected yet.';
-        }else{
-          for(let j = 0; j<selectedItemList.length; j++){
+        } else {
+          for (let j = 0; j < selectedItemList.length; j++) {
             response = response + selectedItemList[j].amount + ' - ' + selectedItemList[j].name;
           }
         }
@@ -589,16 +592,16 @@ restService.post("/webhook", function (req, res) {
         //Return response to user
         return res.json({
           fulfillmentText: response,
-          outputContexts : [
+          outputContexts: [
             {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup",
               lifespanCount: 2,
               parameters: {
-                "selectedItems" : selectedItemList,
-                "restaurant" : restaurant,
-                "date" : date,
-                "time" : time,
-                "availableItems" : itemList
+                "selectedItems": selectedItemList,
+                "restaurant": restaurant,
+                "date": date,
+                "time": time,
+                "availableItems": itemList
               }
             }
           ]
@@ -611,20 +614,20 @@ restService.post("/webhook", function (req, res) {
           specifiedAmount = req.body.queryResult.parameters.amount;
         }
 
-        selectedItemList.push({"amount" : specifiedAmount, "name": selectedItem.name, "price": selectedItem.price});
-        
+        selectedItemList.push({ "amount": specifiedAmount, "name": selectedItem.name, "price": selectedItem.price });
+
         return res.json({
           fulfillmentText: 'You\'ve selected ' + specifiedAmount + ' item of ' + selectedItem.name + ', would you like to add any other item to this order?',
-          outputContexts : [
+          outputContexts: [
             {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/orderItems-followup",
               lifespanCount: 2,
               parameters: {
-                "selectedItems" : selectedItemList,
-                "restaurant" : restaurant,
-                "date" : date,
-                "time" : time,
-                "availableItems" : itemList
+                "selectedItems": selectedItemList,
+                "restaurant": restaurant,
+                "date": date,
+                "time": time,
+                "availableItems": itemList
               }
             }
           ]
@@ -649,11 +652,11 @@ restService.post("/webhook", function (req, res) {
         contextMatched = true;
         relevantContext = context;
         // Recover the list of previously selected items and push this item to the list
-        if(context.parameters.selectedItems){
+        if (context.parameters.selectedItems) {
           //Get all the previously selected items in a variable
           selectedItemList = context.parameters.selectedItems;
         }
-        
+
         //Find if the availableItems exists
         if (context.parameters.availableItems) {
           //Assign variable to the active order list
@@ -679,14 +682,14 @@ restService.post("/webhook", function (req, res) {
         }
       }
     });
-    
+
     //If context wasn't found, send a message to user
     if (!contextMatched) {
       return res.json({
         fulfillmentText: 'Some error with the context names took place, please try again.'
       });
     }
-    else{
+    else {
       //More items wan to be added
       if (req.body.queryResult.intent.displayName == 'moreItemsYes') {
         let listOfAvailableItemsString = '';
@@ -697,14 +700,14 @@ restService.post("/webhook", function (req, res) {
         }
 
         let selectedItemListStr = '';
-        for(let i = 0; i < selectedItemList.length; i++){
+        for (let i = 0; i < selectedItemList.length; i++) {
           selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name + '\n';
         }
 
         //Return to previous context with the restaurant related + datetime related + selected items info
         return res.json({
           fulfillmentText: 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items so far: ' +
-          selectedItemListStr + '. Which one of the following list would you like to add to them? \n' + listOfAvailableItemsString,
+            selectedItemListStr + '. Which one of the following list would you like to add to them? \n' + listOfAvailableItemsString,
           outputContexts: [
             {
               name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
@@ -722,7 +725,7 @@ restService.post("/webhook", function (req, res) {
       }
 
       //No more items want to be ordered
-      else{
+      else {
         let response;
         let totalCost = 0;
         let selectedItemListStr = '';
@@ -734,13 +737,13 @@ restService.post("/webhook", function (req, res) {
             selectedItemListStr += selectedItemList[i].amount + ' - ' + selectedItemList[i].name + '\n';
           }
           response = 'The order in ' + selectedRestaurant + ' at ' + specifiedTime + ' on ' + specifiedDate + ' has the following items: \n' +
-          selectedItemListStr + '.\n The total cost of this operation is ' + totalCost + '€. This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
-          'Card number, the month when the validity of the card ends and the CVC code (which you can find behind your card).'
-        }else{
+            selectedItemListStr + '.\n The total cost of this operation is ' + totalCost + '€. This process only allows payment by credit or debit card, therefore the following information is needed:\n' +
+            'Card number, the month when the validity of the card ends and the CVC code (which you can find behind your card).'
+        } else {
           response = 'No item was selected, no order can be placed.';
         }
 
-        
+
         //No more items want to be added
         return res.json({
           fulfillmentText: response,
@@ -759,9 +762,9 @@ restService.post("/webhook", function (req, res) {
           ]
         });
       }
-      
+
     }
-    
+
   }
   /* ORDER RELATED ACTIONS - END */
 
