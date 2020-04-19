@@ -39,7 +39,7 @@ restService.use(bodyParser.json());
 //restService.use(express.json({extended:false}));
 
 
-restService.post("/webhook", async function (req, res) {
+restService.post("/webhook", function (req, res) {
   var PROJECT_ID = 'carry-lajhni';
   var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
   var speech = '';
@@ -904,7 +904,7 @@ restService.post("/webhook", async function (req, res) {
 
             orderLineItems.save()
               .then(dbOrderLineList => {
-                let creditcardFound = await CreditCard.findOneAndUpdate(
+                CreditCard.findOneAndUpdate(
                   { email: userInformationJSON.email }, 
                   {
                     $set: {
@@ -916,17 +916,11 @@ restService.post("/webhook", async function (req, res) {
                       email: userInformationJSON.email
                   }
                 }, { upsert: true });
-                if(creditcardFound){
-                  return res.json({
-                    fulfillmentText: 'Nice! You have just paid your order and updated your credit card information, you will shortly receive an email with the information of your transaction. the encrypted data is ' 
-                    + JSON.stringify({cvc:cvc_Encrypted, cardN: creditCardNum_Encrypted, year: expirationYear_Encrypted, month: expirationMonth_Encrypted})
-                  });
-                }else{
+                
                   return res.json({
                     fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. the encrypted data is ' 
                     + JSON.stringify({cvc:cvc_Encrypted, cardN: creditCardNum_Encrypted, year: expirationYear_Encrypted, month: expirationMonth_Encrypted})
                   });
-                }
               }).catch(e => {
                 return res.json({
                   fulfillmentText: 'Error took place while creating the order lines: ' + JSON.stringify(e)
