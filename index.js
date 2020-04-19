@@ -372,7 +372,7 @@ restService.post("/webhook", function (req, res) {
       }
       else {
         return res.json({
-          fulfillmentText: 'You want to set a value of ' + insertedValue + ' in the order in the position number ' + selectedPosition + ', is that right?',
+          fulfillmentText: 'You want to set a value of ' + insertedValue + ' in the order in the order number ' + selectedPosition + ', is that right?',
           outputContexts: [{
             name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/setEvaluationValue-followup",
             lifespanCount: 2,
@@ -423,8 +423,8 @@ restService.post("/webhook", function (req, res) {
     //If everything is okay, save the value in database and indicate process finish to user.
     else {
       //TODO manage values in DB
-      CreditCard.findByIdAndUpdate( deliveredOrderList[arrayPosition].id ,
-        { rating: insertedValue }
+      CreditCard.findOneAndUpdate( {_id: 'ObjectId("'+deliveredOrderList[arrayPosition].id+'")'},
+        { $set: {rating: insertedValue} }
       ).exec().then(orderUpdated => {
         return res.json({
           fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + insertedValue + '. Id ' + deliveredOrderList[arrayPosition].id

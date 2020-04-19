@@ -8,7 +8,6 @@ const KEY = "Carry";
 
 
 router.post('/', async (req, res, next) => {
-
     var cvc = req.body.cvc;
     var cvc_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(cvc), KEY).toString();
     var creditCardNum_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(req.body.cardNumber), cvc).toString();
