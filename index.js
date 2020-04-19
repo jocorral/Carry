@@ -64,20 +64,28 @@ restService.post("/webhook", function (req, res) {
         //If contains "to evaluate" the context will be of evaluation
         if (req.body.queryResult.parameters.selectedAction.includes('to evaluate')) {
           //If an order wants to be evaluated, the context is set to evaluation
-          // TODO Get list of delivered orders for that user information
           var listOfDeliveredOrders = [];
-          listOfDeliveredOrders[0] = { "name": "July 23, 2019" };
-          listOfDeliveredOrders[1] = { "name": "July 24, 2019" };
-          listOfDeliveredOrders[2] = { "name": "July 25, 2019" };
-          listOfDeliveredOrders[3] = { "name": "July 26, 2019" };
-          listOfDeliveredOrders[4] = { "name": "July 27, 2019" };
+
+          Order.find({status: 'Delivered',userEmail:userInformationJSON.email}).exec()
+          .then(orderList => {
+              orderList.forEach(order => {
+                listOfDeliveredOrders.push({
+                  "name": 'Order on ' + order.orderDate + ' at ' + order.orderTime + ' with a ' + order.totalCost + '€ cost',
+                  "id" : order._id
+                });
+              });
+          })
+          .catch(err => {
+              console.error('ERROR' ,err);
+              res.status(500).json({ error: 'No establishment found with id ' + eId + ' ' + err });
+          });
 
           var listString = '';
 
           // List of delivered orders will be stringified so that the assistant prints them
           if (listOfDeliveredOrders.length !== 0) {
             for (let i = 0; i < listOfDeliveredOrders.length; i++) {
-              listString = listString + (i + 1) + ' - ' + listOfDeliveredOrders[i].name + '\n';
+              listString = listString + '\n' + (i + 1) + ' - ' + listOfDeliveredOrders[i].name;
             }
           }
 

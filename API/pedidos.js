@@ -5,8 +5,19 @@ const OrderLine = require('../DB/OrderLine');
 const OrderLineList = require('../DB/OrderLineList');
 
 
-router.get('/', (req, res) => {
-    res.send('Estamos en los pedidos 2.');
+router.get('/:status', (req, res) => {
+    const status = req.params.status;
+    Order.find({status: status,userEmail:'jorgecrrl@gmail.com'}).exec()
+    .then(docs => {
+        docs.forEach(order => {
+            console.log(order.orderTime);
+        });
+        res.status(200).json({status:status,recordNumber:docs.length,data:docs});
+    })
+    .catch(err => {
+        console.error('ERROR' ,err);
+        res.status(500).json({ error: 'No establishment found with id ' + eId + ' ' + err });
+    });
 });
 
 
