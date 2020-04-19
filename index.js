@@ -257,6 +257,7 @@ restService.post("/webhook", function (req, res) {
     //Variable to control if any of the context matches the specified context name
     let contextMatched = false;
     let activeOrderList;
+    let selectedOrder;
     //Check if there are any context
     if (req.body.queryResult.outputContexts) {
       req.body.queryResult.outputContexts.forEach(context => {
@@ -272,40 +273,30 @@ restService.post("/webhook", function (req, res) {
           //Then check that the variable number exists in that context
           if (context.parameters.number) {
             //Variable in number is not adapted to array, adapt it
-            let number = context.parameters.number;
-            let arrayPosition = number - 1;
-
-            Order.findByIdAndUpdate(activeOrderList[arrayPosition].id, { $set: { status: 'Canceled' } },
-              function (errorOrderEvaluation, orderUpdated) {
-                if (orderUpdated) {
-                  return res.json({
-                    fulfillmentText: 'The order ' + activeOrderList[arrayPosition].name + ' has been canceled.'
-                  });
-                } else {
-                  return res.json({
-                    fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation) +
-                      'Position ' + JSON.stringify(arrayPosition) + '. Id ' + JSON.stringify(activeOrderList[arrayPosition].id)
-                  });
-                }
-              });
-            //Return response to user
-            return res.json({
-              fulfillmentText: 'Order number ' + number + ' has been cancelled. (Array pos: ' + arrayPosition + ')',
-            });
-          } else {
-            return res.json({
-              fulfillmentText: 'Context did not contain the necesary parameter ' + JSON.stringify(context),
-            });
+            selectedOrder = context.parameters.number;
           }
         }
       });
     }
 
     //Check if context was not found
-    if (!contextMatched) {
-      return res.json({
-        fulfillmentText: 'The name of the context was not found between the current context list ' + JSON.stringify(req.body.queryResult.outputContexts),
-      });
+    if (contextMatched) {
+      let arrayPosition = selectedOrder - 1;
+
+      Order.findByIdAndUpdate(activeOrderList[arrayPosition].id, { $set: { status: 'Canceled' } },
+        function (errorOrderEvaluation, orderUpdated) {
+          if (orderUpdated) {
+            return res.json({
+              fulfillmentText: 'The order ' + activeOrderList[arrayPosition].name + ' has been canceled.'
+            });
+          }
+          else {
+            return res.json({
+              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation) +
+                'Position ' + JSON.stringify(arrayPosition) + '. Id ' + JSON.stringify(activeOrderList[arrayPosition].id)
+            });
+          }
+        });
     }
 
   }
