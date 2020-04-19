@@ -113,36 +113,37 @@ restService.post("/webhook", function (req, res) {
           var listString = '';
 
           Order.find({ status: 'Active', userEmail: userInformationJSON.email }).exec()
-          .then(orderList => {
-            orderList.forEach(order => {
-              listOfActiveOrders.push({
-                "name": 'Order on ' + order.orderDate + ' at ' + order.orderTime + ' with a ' + order.totalCost + '€ cost',
-                "id": order._id
+            .then(orderList => {
+              orderList.forEach(order => {
+                listOfActiveOrders.push({
+                  "name": 'Order on ' + order.orderDate + ' at ' + order.orderTime + ' with a ' + order.totalCost + '€ cost',
+                  "id": order._id
+                });
+              });
+
+              if (listOfActiveOrders.length !== 0) {
+                for (let i = 0; i < listOfActiveOrders.length; i++) {
+                  listString = listString + '\n' + (i + 1) + ' - ' + listOfDeliveredOrders[i].name;
+                }
+              }
+              
+              return res.json({
+                fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
+                outputContexts: [
+                  {
+                    name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_cancelation",
+                    lifespanCount: 3,
+                    parameters: {
+                      "activeorders": listOfActiveOrders
+                    }
+                  }
+                ]
+              });
+            }).catch(activeOrderError => {
+              return res.json({
+                fulfillmentText: 'Error trying to retrieve the active orders ' + JSON.stringify(activeOrderError) + JSON.stringify(listOfActiveOrders)
               });
             });
-
-            if (listOfActiveOrders.length !== 0) {
-              for (let i = 0; i < listOfActiveOrders.length; i++) {
-                listString = listString + '\n' + (i + 1) + ' - ' + listOfDeliveredOrders[i].name;
-              }
-            }
-            return res.json({
-              fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
-              outputContexts: [
-                {
-                  name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_cancelation",
-                  lifespanCount: 3,
-                  parameters: {
-                    "activeorders": listOfActiveOrders
-                  }
-                }
-              ]
-            });
-          }).catch(activeOrderError =>{
-            return res.json({
-              fulfillmentText: 'Error trying to retrieve the active orders ' + JSON.stringify(activeOrderError)
-            });
-          });
         }
 
         //If contains "to make"/"to place"/"to order" the context will be creation
@@ -273,7 +274,6 @@ restService.post("/webhook", function (req, res) {
             let number = context.parameters.number;
             let arrayPosition = number - 1;
 
-            //TODO Make modifications on DB
             Order.findByIdAndUpdate(activeOrderList[arrayPosition].id, { $set: { status: 'Canceled' } },
               function (errorOrderEvaluation, orderUpdated) {
                 if (orderUpdated) {
@@ -283,7 +283,7 @@ restService.post("/webhook", function (req, res) {
                 } else {
                   return res.json({
                     fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation) +
-                      'Position ' + JSON.stringify(arrayPosition) + '. Id ' + JSON.stringify(activeOrderList[arrayPosition].id) 
+                      'Position ' + JSON.stringify(arrayPosition) + '. Id ' + JSON.stringify(activeOrderList[arrayPosition].id)
                   });
                 }
               });
