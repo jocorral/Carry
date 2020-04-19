@@ -405,7 +405,7 @@ restService.post("/webhook", function (req, res) {
         }
         if (context.parameters.evaluationvalue) {
           //Assign variable to the delivered order list
-          insertedValue = context.parameters.evaluationvalue;
+          insertedValue = parseInt(context.parameters.evaluationvalue);
         }
         if (context.parameters.deliveredOrders) {
           //Assign variable to the delivered order list
@@ -430,7 +430,7 @@ restService.post("/webhook", function (req, res) {
             rating: insertedValue
           }
         },
-        { upsert: true }
+        { upsert: false }
       ).then(orderUpdated => {
         return res.json({
           fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + insertedValue + '.'
