@@ -66,7 +66,7 @@ restService.post("/webhook", function (req, res) {
           //If an order wants to be evaluated, the context is set to evaluation
           var listOfDeliveredOrders = [];
 
-          Order.find({ status: 'Delivered', userEmail: userInformationJSON.email }).exec()
+          Order.find({ status: 'Delivered', userEmail: userInformationJSON.email, rating: 0 }).exec()
             .then(orderList => {
               orderList.forEach(order => {
                 listOfDeliveredOrders.push({
