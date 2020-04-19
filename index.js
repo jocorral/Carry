@@ -818,7 +818,7 @@ restService.post("/webhook", function (req, res) {
     //Get the parameters of the credit card
     if (req.body.queryResult.parameters) {
       if (req.body.queryResult.parameters.cardNumber) {
-        creditCardNum = req.body.queryResult.parameters.cardNumber;
+        creditCardNum = req.body.queryResult.parameters.cardNumber.toString();
       }
       if (req.body.queryResult.parameters.expiration) {
         expirationMonth = req.body.queryResult.parameters.expiration;
@@ -827,15 +827,15 @@ restService.post("/webhook", function (req, res) {
         expirationYear = req.body.queryResult.parameters.expirationYear;
       }
       if (req.body.queryResult.parameters.cvc) {
-        cvc = req.body.queryResult.parameters.cvc;
+        cvc = req.body.queryResult.parameters.cvc.toString();
       }
 
       if (cvc) {
         //Encrypt data
-        /*cvc_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(cvc), KEY).toString();
+        cvc_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(cvc), KEY).toString();
         creditCardNum_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(creditCardNum), cvc).toString();
         expirationYear_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(expirationYear.substring(expirationYear.length - 2)), cvc).toString();
-        expirationMonth_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(expirationMonth), cvc).toString();*/
+        expirationMonth_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(expirationMonth), cvc).toString();
       }
     }
 
