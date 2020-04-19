@@ -835,7 +835,7 @@ restService.post("/webhook", function (req, res) {
         cvc_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(cvc), KEY).toString();
         creditCardNum_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(creditCardNum), cvc).toString();
         expirationMonth_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(expirationMonth), cvc).toString();
-       /* expirationYear_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(expirationYear.substring(expirationYear.length - 2)), cvc).toString();*/
+        expirationYear_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(expirationYear.substring(expirationYear.length - 2)), cvc).toString();
       }
     }
 
