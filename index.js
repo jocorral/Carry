@@ -278,9 +278,9 @@ restService.post("/webhook", function (req, res) {
         }
       });
     }
-    let arrayPosition = selectedOrder - 1;
+    
     //Check if context was not found
-    /*if (contextMatched) {
+    if (contextMatched) {
       let arrayPosition = selectedOrder - 1;
 
       Order.findByIdAndUpdate(activeOrderList[arrayPosition].id, { $set: { status: 'Canceled' } },
@@ -293,15 +293,11 @@ restService.post("/webhook", function (req, res) {
           else {
             return res.json({
               fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderCancelation) +
-                'Position ' + JSON.stringify(arrayPosition) + '. Id ' + JSON.stringify(activeOrderList[arrayPosition].id)
+              'Position ' + JSON.stringify(arrayPosition) + '. List ' + JSON.stringify(activeOrderList)
             });
           }
         });
-    }*/
-    return res.json({
-      fulfillmentText: 'Cancelation complete ' +
-        'Position ' + JSON.stringify(arrayPosition) + '. List ' + JSON.stringify(activeOrderList)
-    });
+    }
   }
   /* CANCELLATION RELATED ACTIONS - END */
 
