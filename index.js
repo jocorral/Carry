@@ -66,43 +66,43 @@ restService.post("/webhook", function (req, res) {
           //If an order wants to be evaluated, the context is set to evaluation
           var listOfDeliveredOrders = [];
 
-          Order.find({status: 'Delivered',userEmail:userInformationJSON.email}).exec()
-          .then(orderList => {
+          Order.find({ status: 'Delivered', userEmail: userInformationJSON.email }).exec()
+            .then(orderList => {
               orderList.forEach(order => {
                 listOfDeliveredOrders.push({
                   "name": 'Order on ' + order.orderDate + ' at ' + order.orderTime + ' with a ' + order.totalCost + '€ cost',
-                  "id" : order._id
+                  "id": order._id
                 });
               });
-          })
-          .catch(err => {
-              console.error('ERROR' ,err);
-              res.status(500).json({ error: 'No establishment found with id ' + eId + ' ' + err });
-          });
 
-          var listString = '';
+              var listString = '';
 
-          // List of delivered orders will be stringified so that the assistant prints them
-          if (listOfDeliveredOrders.length !== 0) {
-            for (let i = 0; i < listOfDeliveredOrders.length; i++) {
-              listString = listString + '\n' + (i + 1) + ' - ' + listOfDeliveredOrders[i].name;
-            }
-          }
-
-
-          // Return response to user
-          return res.json({
-            fulfillmentText: 'The list of delivered orders is the following: ' + listString + ' which one of them do you want to evaluate?',
-            outputContexts: [
-              {
-                name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_evaluation",
-                lifespanCount: 5,
-                parameters: {
-                  "deliveredorders": listOfDeliveredOrders
+              // List of delivered orders will be stringified so that the assistant prints them
+              if (listOfDeliveredOrders.length !== 0) {
+                for (let i = 0; i < listOfDeliveredOrders.length; i++) {
+                  listString = listString + '\n' + (i + 1) + ' - ' + listOfDeliveredOrders[i].name;
                 }
               }
-            ]
-          });
+
+              // Return response to user
+              return res.json({
+                fulfillmentText: 'The list of delivered orders is the following: ' + listString + ' which one of them do you want to evaluate?',
+                outputContexts: [
+                  {
+                    name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_evaluation",
+                    lifespanCount: 5,
+                    parameters: {
+                      "deliveredorders": listOfDeliveredOrders
+                    }
+                  }
+                ]
+              });
+            })
+            .catch(err => {
+              return res.json({
+              fulfillmentText: 'An error took place trying to recover the information related to the delivered orders ' + JSON.stringify(err)
+              });
+            });
         }
 
         //If contains "to cancel" the context will be of cancelation
@@ -913,7 +913,7 @@ restService.post("/webhook", function (req, res) {
             orderLineItems.save()
               .then(dbOrderLineList => {
                 CreditCard.findOneAndUpdate(
-                  { email: userInformationJSON.email }, 
+                  { email: userInformationJSON.email },
                   {
                     $set: {
                       cardNumber: creditCardNum_Encrypted,
@@ -922,17 +922,17 @@ restService.post("/webhook", function (req, res) {
                       cvc: cvc_Encrypted,
                       name: userInformationJSON.name,
                       email: userInformationJSON.email
-                  }
-                }, { upsert: true }).exec().then(cardSuccess =>{
-                  return res.json({
-                    fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction.'
+                    }
+                  }, { upsert: true }).exec().then(cardSuccess => {
+                    return res.json({
+                      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction.'
+                    });
+                  }).catch(cardError => {
+                    return res.json({
+                      fulfillmentText: 'Error took place saving the card information: ' + JSON.stringify(cardError)
+                    });
                   });
-                }).catch(cardError =>{
-                  return res.json({
-                    fulfillmentText: 'Error took place saving the card information: '  + JSON.stringify(cardError)
-                  });
-                });
-                
+
               }).catch(e => {
                 return res.json({
                   fulfillmentText: 'Error took place while creating the order lines: ' + JSON.stringify(e)
