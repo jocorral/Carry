@@ -278,7 +278,7 @@ restService.post("/webhook", function (req, res) {
         }
       });
     }
-
+    let arrayPosition = selectedOrder - 1;
     //Check if context was not found
     /*if (contextMatched) {
       let arrayPosition = selectedOrder - 1;
