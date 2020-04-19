@@ -100,7 +100,7 @@ restService.post("/webhook", function (req, res) {
             })
             .catch(err => {
               return res.json({
-              fulfillmentText: 'An error took place trying to recover the information related to the delivered orders ' + JSON.stringify(err)
+                fulfillmentText: 'An error took place trying to recover the information related to the delivered orders ' + JSON.stringify(err)
               });
             });
         }
@@ -327,7 +327,8 @@ restService.post("/webhook", function (req, res) {
                 name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/evaluateorder-followup",
                 lifespanCount: 2,
                 parameters: {
-                  "number": number
+                  "number": number,
+                  "deliveredOrders": deliveredOrderList
                 }
               }
             ]
@@ -339,12 +340,16 @@ restService.post("/webhook", function (req, res) {
   else if (req.body.queryResult.intent.displayName == 'setEvaluationValue') {
     let insertedValue = 0;
     let selectedPosition;
+    let deliveredOrderList;
 
     //If the position was seelected previously, recover it.
     req.body.queryResult.outputContexts.forEach(context => {
       if (context.name == "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/evaluateorder-followup") {
         if (context.parameters && context.parameters.number) {
           selectedPosition = context.parameters.number;
+        }
+        if (context.parameters && context.parameters.deliveredOrders) {
+          deliveredOrderList = context.parameters.deliveredOrders;
         }
       }
     });
@@ -359,7 +364,8 @@ restService.post("/webhook", function (req, res) {
             name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/evaluateorder-followup",
             lifespanCount: 2,
             parameters: {
-              "number": selectedPosition
+              "number": selectedPosition,
+              "deliveredOrders": deliveredOrderList
             }
           }]
         });
@@ -372,7 +378,8 @@ restService.post("/webhook", function (req, res) {
             lifespanCount: 2,
             parameters: {
               "evaluationposition": selectedPosition,
-              "evaluationvalue": insertedValue
+              "evaluationvalue": insertedValue,
+              "deliveredOrders": deliveredOrderList
             }
           }]
         });
@@ -384,6 +391,7 @@ restService.post("/webhook", function (req, res) {
     var selectedposition;
     var insertedValue;
     var arrayPosition;
+    var deliveredOrderList;
     //Recover the list of delivered orders from context
     req.body.queryResult.outputContexts.forEach(context => {
       //Find the correct context
@@ -399,6 +407,10 @@ restService.post("/webhook", function (req, res) {
           //Assign variable to the delivered order list
           insertedValue = context.parameters.evaluationvalue;
         }
+        if (context.parameters.deliveredOrders) {
+          //Assign variable to the delivered order list
+          deliveredOrderList = context.parameters.deliveredOrders;
+        }
       }
     });
 
@@ -411,9 +423,22 @@ restService.post("/webhook", function (req, res) {
     //If everything is okay, save the value in database and indicate process finish to user.
     else {
       //TODO manage values in DB
-
-      return res.json({
-        fulfillmentText: 'The position ' + selectedposition + ' has been evaluated with a ' + insertedValue + '. (Array position ' + arrayPosition + ')'
+      CreditCard.findOneAndUpdate(
+        { _id: deliveredOrderList[arrayPosition].id },
+        {
+          $set: {
+            rating: insertedValue
+          }
+        },
+        { upsert: true }
+      ).then(orderUpdated => {
+        return res.json({
+          fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + insertedValue + '.'
+        });
+      }).catch(errorOrderEvaluation => {
+        return res.json({
+          fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation)
+        });
       });
     }
   }
@@ -457,7 +482,7 @@ restService.post("/webhook", function (req, res) {
 
                 if (listOfAvailableItems.length !== 0) {
                   for (let i = 0; i < listOfAvailableItems.length; i++) {
-                    listOfAvailableItemsStringWritten = listOfAvailableItemsStringWritten + '\n - ' + listOfAvailableItems[i].name + '(' + listOfAvailableItems[i].idwords + ')';
+                    listOfAvailableItemsStringWritten = listOfAvailableItemsStringWritten + '\n' + ' - ' + listOfAvailableItems[i].name + '(' + listOfAvailableItems[i].idwords + ')';
                   }
                 } else {
                   return res.json({
@@ -477,7 +502,7 @@ restService.post("/webhook", function (req, res) {
                 // Return response to user
                 return res.json({
                   fulfillmentText: 'Great! Order will be placed at ' + restaurant + ' for ' + date + ' at ' + time + '.\n' +
-                    'This restaurant contains the following available items (Id words between brackets):\n' + dishes + '.',
+                    'This restaurant contains the following available items (Id words between brackets):' + '\n' + dishes + '.',
                   outputContexts: [
                     {
                       name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_order_placed",
