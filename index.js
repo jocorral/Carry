@@ -812,8 +812,8 @@ restService.post("/webhook", function (req, res) {
     var cvc = '';
     var cvc_Encrypted = '';
     var creditCardNum_Encrypted = '';
-    var expirationYear_Encrypted = '';
     var expirationMonth_Encrypted = '';
+    var expirationYear_Encrypted = '';
 
     //Get the parameters of the credit card
     if (req.body.queryResult.parameters) {
