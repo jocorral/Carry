@@ -14,7 +14,8 @@ const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test
 mongoose.connect(URI, {
     useCreateIndex: true,
     useUnifiedTopology: true,
-    useNewUrlParser: true 
+    useNewUrlParser: true,
+    useFindAndModify: false
 },() => {
     console.log("Connected to db");
 });
@@ -24,6 +25,7 @@ app.use(express.json({extended:false}));
 app.use('/pedidos', require('./API/pedidos'));
 app.use('/restaurantes', require('./API/restaurantes'));
 app.use('/platos', require('./API/platos'));
+app.use('/tarjetas', require('./API/tarjetas'));
 
 //Check if any port is free, else use 3000
 const Port =  3000; //process.env.Port ||

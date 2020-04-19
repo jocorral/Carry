@@ -5,13 +5,17 @@ const bodyParser = require("body-parser");
 const jwt = require('jsonwebtoken');
 const converter = require('number-to-words');
 const mongoose = require('mongoose');
+var AES = require("crypto-js/aes");
+
 const Dish = require('./DB/Dish');
 const Order = require('./DB/Order');
 const OrderLine = require('./DB/OrderLine');
 const OrderLineList = require('./DB/OrderLineList');
 const Establishment = require('./DB/Establishment');
+const CreditCard = require('./DB/CreditCard');
 
 const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
+const KEY = "Carry";
 
 const restService = express();
 
@@ -25,7 +29,8 @@ mongoose.connect(URI, {
   //useMongoClient: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
-  useNewUrlParser: true
+  useNewUrlParser: true,
+  useFindAndModify: false
 }, () =>
   console.log('Carry cluster in Mongodb has been reached')
 );
@@ -567,6 +572,9 @@ restService.post("/webhook", function (req, res) {
         else if (wordList[i].toLowerCase() === 'peperoni') {
           wordList[i] = 'peperoni';
         }
+        else if (wordList[i].toLowerCase() === 'barbacoa') {
+          wordList[i] = 'bbq';
+        }
         else {
           //If it's a number, transform it into a word
           if (!isNaN(wordList[i])) {
@@ -798,13 +806,40 @@ restService.post("/webhook", function (req, res) {
 
   /* PAYMENT - START */
   else if (req.body.queryResult.intent.displayName == 'pay') {
-    var transactionCost = 0;
-    var creditCardPAN = '';
-    var validity = '';
+    var creditCardNum = '';
+    var expirationYear = '';
+    var expirationMonth = '';
     var cvc = '';
-    var saveCreditCard = false;
+    var cvc_Encrypted = '';
+    var creditCardNum_Encrypted = '';
+    var expirationYear_Encrypted = '';
+    var expirationMonth_Encrypted = '';
 
-    //TODO save it in mongo
+    //Get the parameters of the credit card
+    if (req.body.queryResult.parameters) {
+      if (req.body.queryResult.parameters.cardNumber) {
+        creditCardNum = req.body.queryResult.parameters.cardNumber;
+      }
+      if (req.body.queryResult.parameters.expiration) {
+        expirationMonth = req.body.queryResult.parameters.expiration;
+      }
+      if (req.body.queryResult.parameters.expirationYear) {
+        expirationYear = req.body.queryResult.parameters.expirationYear;
+      }
+      if (req.body.queryResult.parameters.cvc) {
+        cvc = req.body.queryResult.parameters.cvc;
+      }
+
+      if (cvc) {
+        //Encrypt data
+        cvc_Encrypted = AES.encrypt(JSON.stringify(cvc), KEY).toString();
+        creditCardNum_Encrypted = AES.encrypt(JSON.stringify(creditCardNum), cvc).toString();
+        expirationYear_Encrypted = AES.encrypt(JSON.stringify(expirationYear.substring(expirationYear.length - 2)), cvc).toString();
+        expirationMonth_Encrypted = AES.encrypt(JSON.stringify(expirationMonth), cvc).toString();
+      }
+    }
+
+    //Recover parameters from context
     var contextMatched = false;
     let restaurant;
     let restaurantId;
@@ -813,7 +848,6 @@ restService.post("/webhook", function (req, res) {
     let selectedItemList = [];
     let totalCost;
 
-    //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context => {
       //The context of order items followup will contain selected Items
       if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_payment") {
@@ -839,6 +873,7 @@ restService.post("/webhook", function (req, res) {
         }
       }
     });
+
 
     if (contextMatched) {
       //Save all the information in db
@@ -870,6 +905,19 @@ restService.post("/webhook", function (req, res) {
 
             orderLineItems.save()
               .then(dbOrderLineList => {
+
+                CreditCard.findOneAndUpdate(
+                  { email: userInformationJSON.email }, 
+                  {
+                    $set: {
+                      cardNumber: creditCardNum_Encrypted,
+                      expirationMonth: expirationMonth_Encrypted,
+                      expirationYear: expirationYear_Encrypted,
+                      cvc: cvc_Encrypted,
+                      name: userInformationJSON.name,
+                      email: userInformationJSON.email
+                  }
+                }, { upsert: true });
                 return res.json({
                   fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. '
                 });

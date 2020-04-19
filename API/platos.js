@@ -68,6 +68,22 @@ router.get('/:establishmentName', (req, res, next) => {
     }); 
 });
 
+router.get('/', (req, res, next) => {
+    Dish.find()
+    .exec()
+    .then(docs => {
+        docs.forEach(dish => {
+            console.log(dish.name);
+        });
+        res.status(200).json(docs);
+    })
+    .catch(err => {
+        console.error('ERROR' ,err);
+        res.status(500).json({ error: 'No dish found' + err });
+    });
+    
+});
+
 
 
 module.exports = router;
