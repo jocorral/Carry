@@ -112,28 +112,36 @@ restService.post("/webhook", function (req, res) {
           var listOfActiveOrders = [];
           var listString = '';
 
-          listOfActiveOrders[0] = { "name": "June 23, 2019" };
-          listOfActiveOrders[1] = { "name": "June 24, 2019" };
-          listOfActiveOrders[2] = { "name": "June 25, 2019" };
-          listOfActiveOrders[3] = { "name": "June 26, 2019" };
-          listOfActiveOrders[4] = { "name": "June 27, 2019" };
-          if (listOfActiveOrders.length !== 0) {
-            for (let i = 0; i < listOfActiveOrders.length; i++) {
-              listString = listString + (i + 1) + ' - ' + listOfActiveOrders[i].name + '\n';
-            }
-          }
-          return res.json({
-            fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
-            speech: speech,
-            outputContexts: [
-              {
-                name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_cancelation",
-                lifespanCount: 3,
-                parameters: {
-                  "activeorders": listOfActiveOrders
-                }
+          Order.find({ status: 'Active', userEmail: userInformationJSON.email }).exec()
+          .then(orderList => {
+            orderList.forEach(order => {
+              listOfActiveOrders.push({
+                "name": 'Order on ' + order.orderDate + ' at ' + order.orderTime + ' with a ' + order.totalCost + '€ cost',
+                "id": order._id
+              });
+            });
+
+            if (listOfActiveOrders.length !== 0) {
+              for (let i = 0; i < listOfActiveOrders.length; i++) {
+                listString = listString + '\n' + (i + 1) + ' - ' + listOfDeliveredOrders[i].name;
               }
-            ]
+            }
+            return res.json({
+              fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
+              outputContexts: [
+                {
+                  name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_cancelation",
+                  lifespanCount: 3,
+                  parameters: {
+                    "activeorders": listOfActiveOrders
+                  }
+                }
+              ]
+            });
+          }).catch(activeOrderError =>{
+            return res.json({
+              fulfillmentText: 'Error trying to retrieve the active orders ' + JSON.stringify(activeOrderError)
+            });
           });
         }
 
@@ -187,7 +195,7 @@ restService.post("/webhook", function (req, res) {
   /* CANCELLATION RELATED ACTIONS - START */
   else if (req.body.queryResult.intent.displayName == 'cancelOrder') {
     var contextMatched = false;
-    var activeOrdersList;
+    var activeOrderList;
     //Recover the list of active orders from context
     req.body.queryResult.outputContexts.forEach(context => {
       //Find the correct context
@@ -196,7 +204,7 @@ restService.post("/webhook", function (req, res) {
         //Find if the variable exists
         if (context.parameters.activeorders) {
           //Assign variable to the active order list
-          activeOrdersList = context.parameters.activeorders;
+          activeOrderList = context.parameters.activeorders;
         }
       }
     });
@@ -213,10 +221,10 @@ restService.post("/webhook", function (req, res) {
       if (req.body.queryResult.parameters.number) {
         let number = parseInt(req.body.queryResult.parameters.number);
         //If the inserted number is bigger than the deliver order list length, don't allow it
-        if (number > activeOrdersList.length || number < 1) {
+        if (number > activeOrderList.length || number < 1) {
           //Return error response to the user
           return res.json({
-            fulfillmentText: 'The specified number is not correct because it\'s not between 1 and ' + activeOrdersList.length + '. Which one do you want to cancel?',
+            fulfillmentText: 'The specified number is not correct because it\'s not between 1 and ' + activeOrderList.length + '. Which one do you want to cancel?',
             outputContexts: [
               {
                 name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_cancelation",
@@ -233,7 +241,8 @@ restService.post("/webhook", function (req, res) {
                 name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/cancelorder-followup",
                 lifespanCount: 2,
                 parameters: {
-                  "number": number
+                  "number": number,
+                  "activeOrders": activeOrderList
                 }
               }
             ]
@@ -245,6 +254,7 @@ restService.post("/webhook", function (req, res) {
   else if (req.body.queryResult.intent.displayName == 'confirmCancelation') {
     //Variable to control if any of the context matches the specified context name
     let contextMatched = false;
+    let activeOrderList;
     //Check if there are any context
     if (req.body.queryResult.outputContexts) {
       req.body.queryResult.outputContexts.forEach(context => {
@@ -252,6 +262,11 @@ restService.post("/webhook", function (req, res) {
         if (context.name === "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/cancelorder-followup") {
           //If context matches, set control variable to true
           contextMatched = true;
+          //Find if the variable exists
+          if (context.parameters.activeorders) {
+            //Assign variable to the active order list
+            activeOrderList = context.parameters.activeorders;
+          }
           //Then check that the variable number exists in that context
           if (context.parameters.number) {
             //Variable in number is not adapted to array, adapt it
@@ -259,7 +274,19 @@ restService.post("/webhook", function (req, res) {
             let arrayPosition = number - 1;
 
             //TODO Make modifications on DB
-
+            Order.findByIdAndUpdate(activeOrderList[arrayPosition].id, { $set: { status: 'Canceled' } },
+              function (errorOrderEvaluation, orderUpdated) {
+                if (orderUpdated) {
+                  return res.json({
+                    fulfillmentText: 'The order ' + activeOrderList[arrayPosition].name + ' has been canceled.'
+                  });
+                } else {
+                  return res.json({
+                    fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation) +
+                      'Position ' + JSON.stringify(arrayPosition) + '. Id ' + JSON.stringify(activeOrderList[arrayPosition].id) 
+                  });
+                }
+              });
             //Return response to user
             return res.json({
               fulfillmentText: 'Order number ' + number + ' has been cancelled. (Array pos: ' + arrayPosition + ')',
@@ -422,27 +449,6 @@ restService.post("/webhook", function (req, res) {
     }
     //If everything is okay, save the value in database and indicate process finish to user.
     else {
-      //TODO manage values in DB
-      /*Order.findOneAndUpdate(
-        {_id:deliveredOrderList[arrayPosition].id},
-        { 
-          $set:{
-            rating: insertedValue 
-          }
-        },
-        { upsert: true }).exec().then(ratingSuccess => {
-          return res.json({
-            fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id) + 
-            ' received ' + JSON.stringify(ratingSuccess)
-          });
-        }).catch(errorOrderRating => {
-          return res.json({
-            fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderRating)+
-            'Value '+JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id)
-          });
-        });*/
-
-
       Order.findByIdAndUpdate(deliveredOrderList[arrayPosition].id, { $set: { rating: insertedValue } },
         function (errorOrderEvaluation, orderUpdated) {
           if (orderUpdated) {
