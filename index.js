@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const jwt = require('jsonwebtoken');
 const converter = require('number-to-words');
 const mongoose = require('mongoose');
-var AES = require("crypto-js/aes");
+var CryptoJS = require("crypto-js");
 
 const Dish = require('./DB/Dish');
 const Order = require('./DB/Order');
@@ -832,10 +832,10 @@ restService.post("/webhook", function (req, res) {
 
       if (cvc) {
         //Encrypt data
-        cvc_Encrypted = AES.encrypt(JSON.stringify(cvc), KEY).toString();
-        creditCardNum_Encrypted = AES.encrypt(JSON.stringify(creditCardNum), cvc).toString();
-        expirationYear_Encrypted = AES.encrypt(JSON.stringify(expirationYear.substring(expirationYear.length - 2)), cvc).toString();
-        expirationMonth_Encrypted = AES.encrypt(JSON.stringify(expirationMonth), cvc).toString();
+        cvc_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(cvc), KEY).toString();
+        creditCardNum_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(creditCardNum), cvc).toString();
+        expirationYear_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(expirationYear.substring(expirationYear.length - 2)), cvc).toString();
+        expirationMonth_Encrypted = CryptoJS.AES.encrypt(JSON.stringify(expirationMonth), cvc).toString();
       }
     }
 
