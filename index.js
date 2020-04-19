@@ -423,17 +423,18 @@ restService.post("/webhook", function (req, res) {
     //If everything is okay, save the value in database and indicate process finish to user.
     else {
       //TODO manage values in DB
-      CreditCard.findOneAndUpdate( {_id: deliveredOrderList[arrayPosition].id},
-        { $set: {rating: insertedValue} }
-      ).exec().then(orderUpdated => {
-        return res.json({
-          fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + insertedValue + '. Id ' + deliveredOrderList[arrayPosition].id
+      CreditCard.findByIdAndUpdate({ _id: deliveredOrderList[arrayPosition].id },
+        { rating: insertedValue }, function (orderUpdated, errorOrderEvaluation) {
+          if (orderUpdated) {
+            return res.json({
+              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + insertedValue + '. Id ' + deliveredOrderList[arrayPosition].id
+            });
+          } else {
+            return res.json({
+              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation)
+            });
+          }
         });
-      }).catch(errorOrderEvaluation => {
-        return res.json({
-          fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation)
-        });
-      });
     }
   }
   /* EVALUATION RELATED ACTIONS - END */
