@@ -30,17 +30,41 @@ router.post('/', async (req, res, next) => {
         { upsert: true }
     );
     
-    var cvc_de = JSON.parse(CryptoJS.AES.decrypt(insertedC.cvc, KEY).toString(CryptoJS.enc.Utf8));
-    var cardnumber_de = JSON.parse(CryptoJS.AES.decrypt(creditCardNum_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
-    var year_de = JSON.parse(CryptoJS.AES.decrypt(expirationYear_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
-    var month_de = JSON.parse(CryptoJS.AES.decrypt(expirationMonth_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
-
-    res.status(201).json({message:'Credit card was saved', data:insertedC, decrypted:{
-        cvc:cvc_de,
-        cardNumber: cardnumber_de,
-        year: year_de,
-        month: month_de
-    }});
+    if(insertedC != null){
+        var cvc_de = JSON.parse(CryptoJS.AES.decrypt(cvc_Encrypted, KEY).toString(CryptoJS.enc.Utf8));
+        console.log(cvc_de);
+        var cardnumber_de = JSON.parse(CryptoJS.AES.decrypt(creditCardNum_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
+        var year_de = JSON.parse(CryptoJS.AES.decrypt(expirationYear_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
+        var month_de = JSON.parse(CryptoJS.AES.decrypt(expirationMonth_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
+    
+        res.status(201).json({message:'Credit card was updated', data:insertedC, decrypted:{
+            cvc:cvc_de,
+            cardNumber: cardnumber_de,
+            year: year_de,
+            month: month_de
+        }});
+    }else{
+        var cvc_de = JSON.parse(CryptoJS.AES.decrypt(cvc_Encrypted, KEY).toString(CryptoJS.enc.Utf8));
+        var cardnumber_de = JSON.parse(CryptoJS.AES.decrypt(creditCardNum_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
+        var year_de = JSON.parse(CryptoJS.AES.decrypt(expirationYear_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
+        var month_de = JSON.parse(CryptoJS.AES.decrypt(expirationMonth_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
+        res.status(201).json({message:'Credit card was created', data:{
+                cardNumber: creditCardNum_Encrypted,
+                expirationMonth: expirationMonth_Encrypted,
+                expirationYear: expirationYear_Encrypted,
+                cvc: cvc_Encrypted,
+                name: req.body.name,
+                email: req.body.email
+            },
+            decrypted : {
+                cvc:cvc_de,
+                cardNumber: cardnumber_de,
+                year: year_de,
+                month: month_de
+            }
+        });
+    }
+    
 });
 
 router.get('/', (req, res, next) => {

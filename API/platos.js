@@ -75,7 +75,7 @@ router.get('/', (req, res, next) => {
         docs.forEach(dish => {
             console.log(dish.name);
         });
-        res.status(200).json(docs);
+        res.status(200).json({recordNumber:docs.length, data:docs});
     })
     .catch(err => {
         console.error('ERROR' ,err);
