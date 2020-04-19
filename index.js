@@ -123,10 +123,10 @@ restService.post("/webhook", function (req, res) {
 
               if (listOfActiveOrders.length !== 0) {
                 for (let i = 0; i < listOfActiveOrders.length; i++) {
-                  listString = listString + '\n' + (i + 1) + ' - ' + listOfDeliveredOrders[i].name;
+                  listString = listString + '\n' + (i + 1) + ' - ' + listOfActiveOrders[i].name;
                 }
               }
-              
+
               return res.json({
                 fulfillmentText: 'The list of active order is the following: ' + listString + ' which one of them do you want to cancel?',
                 outputContexts: [
@@ -139,9 +139,10 @@ restService.post("/webhook", function (req, res) {
                   }
                 ]
               });
-            }).catch(activeOrderError => {
+            })
+            .catch(activeOrderError => {
               return res.json({
-                fulfillmentText: 'Error trying to retrieve the active orders ' + JSON.stringify(activeOrderError) + JSON.stringify(listOfActiveOrders)
+                fulfillmentText: 'Error trying to retrieve the active orders ' + JSON.stringify(activeOrderError)
               });
             });
         }
