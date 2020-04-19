@@ -830,13 +830,13 @@ restService.post("/webhook", async function (req, res) {
         cvc = req.body.queryResult.parameters.cvc;
       }
 
-      if (cvc) {
+      /*if (cvc) {
         //Encrypt data
         cvc_Encrypted = AES.encrypt(JSON.stringify(cvc), KEY).toString();
         creditCardNum_Encrypted = AES.encrypt(JSON.stringify(creditCardNum), cvc).toString();
         expirationYear_Encrypted = AES.encrypt(JSON.stringify(expirationYear.substring(expirationYear.length - 2)), cvc).toString();
         expirationMonth_Encrypted = AES.encrypt(JSON.stringify(expirationMonth), cvc).toString();
-      }
+      }*/
     }
 
     //Recover parameters from context
@@ -881,7 +881,6 @@ restService.post("/webhook", async function (req, res) {
         totalCost: totalCost,
         orderDate: date,
         orderTime: time,
-        orderDatetime: date + 'T' + time,
         rating: 0,
         userEmail: userInformationJSON.email,
         status: 'Active',
@@ -929,7 +928,7 @@ restService.post("/webhook", async function (req, res) {
                 
                 return res.json({
                   fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. the encrypted data is ' 
-                  + JSON.stringify({cvc:cvc_Encrypted, cardN: creditCardNum_Encrypted, year: expirationYear_Encrypted, month: expirationMonth_Encrypted})
+                  + JSON.stringify({cvc:cvc, cardN: creditCardNum, year: expirationYear, month: expirationMonth})
                 });
               }).catch(e => {
                 return res.json({

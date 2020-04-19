@@ -15,7 +15,6 @@ router.post('/', async (req, res) => {
         totalCost: req.body.totalCost,
         orderDate: req.body.orderDate,
         orderTime: req.body.orderTime,
-        orderDatetime: req.body.orderDatetime,
         rating: req.body.rating,
         status: req.body.status,
         userEmail: req.body.userEmail,
