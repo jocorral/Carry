@@ -423,11 +423,12 @@ restService.post("/webhook", function (req, res) {
     //If everything is okay, save the value in database and indicate process finish to user.
     else {
       //TODO manage values in DB
-      CreditCard.findByIdAndUpdate({ _id: deliveredOrderList[arrayPosition].id },
-        { rating: insertedValue }, function (orderUpdated, errorOrderEvaluation) {
+      CreditCard.findByIdAndUpdate(deliveredOrderList[arrayPosition].id,
+        { $set: { rating: insertedValue }}, function (errorOrderEvaluation, orderUpdated) {
           if (orderUpdated) {
             return res.json({
-              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + insertedValue + '. Id ' + deliveredOrderList[arrayPosition].id
+              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. Id ' + deliveredOrderList[arrayPosition].id + 
+              ' received ' + JSON.stringify(orderUpdated)
             });
           } else {
             return res.json({
