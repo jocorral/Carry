@@ -423,7 +423,7 @@ restService.post("/webhook", function (req, res) {
     //If everything is okay, save the value in database and indicate process finish to user.
     else {
       //TODO manage values in DB
-      Order.findOneAndUpdate(
+      /*Order.findOneAndUpdate(
         {_id:deliveredOrderList[arrayPosition].id},
         { 
           $set:{
@@ -440,23 +440,24 @@ restService.post("/webhook", function (req, res) {
             fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderRating)+
             'Value '+JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id)
           });
-        });
-        
-        
-        /*function (errorOrderEvaluation, orderUpdated) {
+        });*/
+
+
+      Order.findByIdAndUpdate(deliveredOrderList[arrayPosition].id, { $set: { rating: insertedValue } },
+        function (errorOrderEvaluation, orderUpdated) {
           if (orderUpdated) {
             return res.json({
-              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id) + 
-              ' received ' + JSON.stringify(orderUpdated)
+              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id) +
+                ' received ' + JSON.stringify(orderUpdated)
             });
           } else {
             return res.json({
-              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation)+
-              'Value '+JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id) + 
-              ' received ' + JSON.stringify(orderUpdated)
+              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation) +
+                'Value ' + JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id) +
+                ' received ' + JSON.stringify(orderUpdated)
             });
           }
-        });*/
+        });
     }
   }
   /* EVALUATION RELATED ACTIONS - END */
