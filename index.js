@@ -39,7 +39,7 @@ restService.use(bodyParser.json());
 //restService.use(express.json({extended:false}));
 
 
-restService.post("/webhook", function (req, res) {
+restService.post("/webhook", async function (req, res) {
   var PROJECT_ID = 'carry-lajhni';
   var SESSION_ID = req.body.originalDetectIntentRequest.payload.conversation.conversationId;
   var speech = '';
@@ -905,8 +905,7 @@ restService.post("/webhook", function (req, res) {
 
             orderLineItems.save()
               .then(dbOrderLineList => {
-
-                CreditCard.findOneAndUpdate(
+                /*let creditcardFound = await CreditCard.findOneAndUpdate(
                   { email: userInformationJSON.email }, 
                   {
                     $set: {
@@ -918,8 +917,19 @@ restService.post("/webhook", function (req, res) {
                       email: userInformationJSON.email
                   }
                 }, { upsert: true });
+                if(creditcardFound){
+                  return res.json({
+                    fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. '
+                  });
+                }else{
+                  return res.json({
+                    fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. '
+                  });
+                }*/
+                
                 return res.json({
-                  fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. '
+                  fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. the encrypted data is ' 
+                  + JSON.stringify({cvc:cvc_Encrypted, cardN: creditCardNum_Encrypted, year: expirationYear_Encrypted, month: expirationMonth_Encrypted})
                 });
               }).catch(e => {
                 return res.json({
