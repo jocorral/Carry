@@ -824,7 +824,7 @@ restService.post("/webhook", function (req, res) {
         expirationMonth = req.body.queryResult.parameters.expiration;
       }
       if (req.body.queryResult.parameters.expirationYear) {
-        expirationYear = req.body.queryResult.parameters.expirationYear;
+        expirationYear = req.body.queryResult.parameters.expirationYear.toString();
       }
       if (req.body.queryResult.parameters.cvc) {
         cvc = req.body.queryResult.parameters.cvc.toString();
