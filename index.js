@@ -919,6 +919,7 @@ restService.post("/webhook", function (req, res) {
                   return res.json({
                     fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. the encrypted data is ' 
                     + JSON.stringify({cvc:cvc_Encrypted, cardN: creditCardNum_Encrypted, year: expirationYear_Encrypted, month: expirationMonth_Encrypted})
+                    + JSON.stringify({cvc:cvc, cardN: creditCardNum, year: expirationYear, month: expirationMonth})
                   });
                 }).catch(cardError =>{
                   return res.json({
