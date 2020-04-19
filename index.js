@@ -423,7 +423,7 @@ restService.post("/webhook", function (req, res) {
     //If everything is okay, save the value in database and indicate process finish to user.
     else {
       //TODO manage values in DB
-      CreditCard.findOneAndUpdate(
+      Order.findOneAndUpdate(
         {_id:deliveredOrderList[arrayPosition].id},
         { 
           $set:{
