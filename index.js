@@ -427,12 +427,14 @@ restService.post("/webhook", function (req, res) {
         { $set: { rating: insertedValue }}, function (errorOrderEvaluation, orderUpdated) {
           if (orderUpdated) {
             return res.json({
-              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. Id ' + deliveredOrderList[arrayPosition].id + 
+              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id) + 
               ' received ' + JSON.stringify(orderUpdated)
             });
           } else {
             return res.json({
-              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation)
+              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation)+
+              'Value '+JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id) + 
+              ' received ' + JSON.stringify(orderUpdated)
             });
           }
         });
