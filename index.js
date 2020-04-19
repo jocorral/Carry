@@ -915,12 +915,19 @@ restService.post("/webhook", function (req, res) {
                       name: userInformationJSON.name,
                       email: userInformationJSON.email
                   }
-                }, { upsert: true });
-                
+                }, { upsert: true }).exec().then(cardSuccess =>{
                   return res.json({
                     fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction. the encrypted data is ' 
                     + JSON.stringify({cvc:cvc_Encrypted, cardN: creditCardNum_Encrypted, year: expirationYear_Encrypted, month: expirationMonth_Encrypted})
                   });
+                }).catch(cardError =>{
+                  return res.json({
+                    fulfillmentText: 'Error took place, encrypted data ' 
+                    + JSON.stringify({cvc:cvc_Encrypted, cardN: creditCardNum_Encrypted, year: expirationYear_Encrypted, month: expirationMonth_Encrypted})+ 
+                    JSON.stringify(cardError)
+                  });
+                });
+                
               }).catch(e => {
                 return res.json({
                   fulfillmentText: 'Error took place while creating the order lines: ' + JSON.stringify(e)
