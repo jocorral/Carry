@@ -266,9 +266,9 @@ restService.post("/webhook", function (req, res) {
           //If context matches, set control variable to true
           contextMatched = true;
           //Find if the variable exists
-          if (context.parameters.activeorders) {
+          if (context.parameters.activeOrders) {
             //Assign variable to the active order list
-            activeOrderList = context.parameters.activeorders;
+            activeOrderList = context.parameters.activeOrders;
           }
           //Then check that the variable number exists in that context
           if (context.parameters.number) {
@@ -280,11 +280,11 @@ restService.post("/webhook", function (req, res) {
     }
 
     //Check if context was not found
-    if (contextMatched) {
+    /*if (contextMatched) {
       let arrayPosition = selectedOrder - 1;
 
       Order.findByIdAndUpdate(activeOrderList[arrayPosition].id, { $set: { status: 'Canceled' } },
-        function (errorOrderEvaluation, orderUpdated) {
+        function (errorOrderCancelation, orderUpdated) {
           if (orderUpdated) {
             return res.json({
               fulfillmentText: 'The order ' + activeOrderList[arrayPosition].name + ' has been canceled.'
@@ -292,13 +292,16 @@ restService.post("/webhook", function (req, res) {
           }
           else {
             return res.json({
-              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation) +
+              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderCancelation) +
                 'Position ' + JSON.stringify(arrayPosition) + '. Id ' + JSON.stringify(activeOrderList[arrayPosition].id)
             });
           }
         });
-    }
-
+    }*/
+    return res.json({
+      fulfillmentText: 'Cancelation complete ' +
+        'Position ' + JSON.stringify(arrayPosition) + '. List ' + JSON.stringify(activeOrderList)
+    });
   }
   /* CANCELLATION RELATED ACTIONS - END */
 
