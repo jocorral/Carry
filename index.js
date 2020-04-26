@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const jwt = require('jsonwebtoken');
 const converter = require('number-to-words');
 const mongoose = require('mongoose');
-var CryptoJS = require("crypto-js");
+const CryptoJS = require("crypto-js");
 
 const Dish = require('./DB/Dish');
 const Order = require('./DB/Order');
@@ -444,8 +444,7 @@ restService.post("/webhook", function (req, res) {
         function (errorOrderEvaluation, orderUpdated) {
           if (orderUpdated) {
             return res.json({
-              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id) +
-                ' received ' + JSON.stringify(orderUpdated)
+              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. '
             });
           } else {
             return res.json({
@@ -547,7 +546,7 @@ restService.post("/webhook", function (req, res) {
       })
       .catch(err => {
         return res.json({
-          fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with the name ' + restaurant + ' ' + err
+          fulfillmentText: 'An error took place while recovering data from db: ' + 'No establishment found with the name ' + restaurant + '.\nTechnical stuff:' + JSON.stringify(err)
         });
       });
   }
@@ -1013,37 +1012,4 @@ restService.post("/webhook", function (req, res) {
 restService.listen(process.env.PORT || 8000, function () {
   console.log("Server up and listening");
 });
-
-/*Parte potencial del package.json
-{
-  "name": "carrywebhook",
-  "version": "1.0.0",
-  "description": "Webhook para el PFM",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jocorral/Carry.git"
-  },
-  "keywords": [
-    "assistant",
-    "voice",
-    "dialogflow"
-  ],
-  "author": "jocorral",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/jocorral/Carry/issues"
-  },
-  "homepage": "https://github.com/jocorral/Carry#readme",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "express": "^4.17.1",
-    "mongoose": "^5.8.11",
-    "moongoose": "0.0.5"
-  }
-}*/
-
 

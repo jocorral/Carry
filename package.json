@@ -4,7 +4,6 @@
   "description": "Webhook para el PFM",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
     "server": "nodemon server.js"
   },
   "author": "jocorral",

@@ -10,4 +10,4 @@ const order = mongoose.Schema({
     establishmentId : {type: mongoose.Schema.Types.ObjectId, ref:'Establishment', required: true}
 });
 
-module.exports = Order = mongoose.model('order', order);
+module.exports = mongoose.model('Order', order);

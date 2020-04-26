@@ -38,9 +38,9 @@ router.post('/', async (req, res) => {
                 let orderLines = [];
                 for (let i = 0; i < 2; i++) {
                     const orderLine = new OrderLine({
-                        amount: 3,
+                        amount: 3 + i,
                         orderId: dbOrder._id,
-                        dishId: '5e9b111d7535b66d002f19e9'
+                        dishId: '5ea4769c3132ad5fa0291f78'
                     });
                     orderLines.push(orderLine);
                 }
@@ -50,7 +50,7 @@ router.post('/', async (req, res) => {
 
                 orderLineItems.save()
                     .then(dbOrderLineList => {
-                        res.json({ createdOrderLines: dbOrderLineList });
+                        res.json({ orderInfor: dbOrder, createdOrderLines: dbOrderLineList });
                         console.log('Order lines created');
                     }).catch(e => {
                         console.log('Error took place in order items ' + e);
