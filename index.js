@@ -994,7 +994,7 @@ restService.post("/webhook", function (req, res) {
                     transporter.sendMail(mailOptions, function(emailError, info){
                       if (emailError) {
                         return res.json({
-                          fulfillmentText: 'An error has taken place sending the email but the order has correctly been placed, you will still receive it at ' + time + ' on ' + date +'.'
+                          fulfillmentText: 'An error has taken place sending the email but the order has correctly been placed, you will still receive it at ' + time + ' on ' + date +'. ' + JSON.stringify(emailError)
                         });
                       } else {
                         return res.json({
