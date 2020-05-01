@@ -991,7 +991,7 @@ restService.post("/webhook", function (req, res) {
                     'Order cost: ' + totalCost + '\n' + 
                     'Order to: ' + userInformationJSON.name + '\n' + 
                     '\nHope you enjoyed the experience using Carry';*/
-                    transporter.sendMail(mailOptions, function(error, info){
+                    transporter.sendMail(mailOptions, function(emailError, info){
                       if (emailError) {
                         return res.json({
                           fulfillmentText: 'An error has taken place sending the email but the order has correctly been placed, you will still receive it at ' + time + ' on ' + date +'.'
