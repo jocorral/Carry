@@ -983,13 +983,13 @@ restService.post("/webhook", function (req, res) {
                     //Email sending
                     mailOptions.to = userInformationJSON.email;
                     mailOptions.subject = 'The order was correctly made';
-                    mailOptions.text = 'This is the information of the order you just made:\n' + 
+                    /*mailOptions.text = 'This is the information of the order you just made:\n' + 
                     'Restaurant: ' + restaurant + '\n' + 
                     'Date of the order: ' + date + '\n' + 
                     'Time of the order: ' + time + '\n' + 
                     'Order cost: ' + totalCost + '\n' + 
                     'Order to: ' + userInformationJSON.name + '\n' + 
-                    '\nHope you enjoyed the experience using Carry';
+                    '\nHope you enjoyed the experience using Carry';*/
                     transporter.sendMail(mailOptions, function(error, info){
                       if (emailError) {
                         return res.json({
