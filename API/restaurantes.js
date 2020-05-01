@@ -40,9 +40,9 @@ router.post('/', (req, res, next) => {
     }*/
 });
 
-router.get('/:establishId', (req, res, next) => {
-    const id = req.params.establishId;
-    Establishment.findById(id)
+router.get('/:establishName', (req, res, next) => {
+    const name = req.params.establishName;
+    Establishment.where('name').equals(name)
         .exec()
         .then(doc => {
             doc.forEach(restaurant => {

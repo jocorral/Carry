@@ -16,6 +16,21 @@ const CreditCard = require('./DB/CreditCard');
 
 const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
 const KEY = "Carry";
+const Creds = require('./constants');
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: Creds.EMAIL_ORIGIN,
+      pass: Creds.PASS
+    }
+});
+const mailOptions = {
+  from: Creds.EMAIL_ORIGIN,
+  to: '',
+  subject: '',
+  text: ''
+};
 
 const restService = express();
 
@@ -86,7 +101,7 @@ restService.post("/webhook", function (req, res) {
 
               // Return response to user
               return res.json({
-                fulfillmentText: 'The list of delivered orders is the following: ' + listString + ' which one of them do you want to evaluate?',
+                fulfillmentText: 'The list of delivered orders is the following: ' + listString + '. Which one of them do you want to evaluate?',
                 outputContexts: [
                   {
                     name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_evaluation",
@@ -292,7 +307,7 @@ restService.post("/webhook", function (req, res) {
           }
           else {
             return res.json({
-              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderCancelation) +
+              fulfillmentText: 'An error took place trying to cancel the order in database. Some technical stuff:' + JSON.stringify(errorOrderCancelation) +
               'Position ' + JSON.stringify(arrayPosition) + '. List ' + JSON.stringify(activeOrderList)
             });
           }
@@ -448,9 +463,7 @@ restService.post("/webhook", function (req, res) {
             });
           } else {
             return res.json({
-              fulfillmentText: 'An error took place inserting the rating to database. ' + JSON.stringify(errorOrderEvaluation) +
-                'Value ' + JSON.stringify(insertedValue) + '. Id ' + JSON.stringify(deliveredOrderList[arrayPosition].id) +
-                ' received ' + JSON.stringify(orderUpdated)
+              fulfillmentText: 'An error took place inserting the rating to database. ' + 'Some technical stuff: ' + JSON.stringify(errorOrderEvaluation)
             });
           }
         });
@@ -500,7 +513,7 @@ restService.post("/webhook", function (req, res) {
                   }
                 } else {
                   return res.json({
-                    fulfillmentText: 'There are no restaurants by the name of ' + restaurant + ' in our database.',
+                    fulfillmentText: 'There are no items available in this restaurant. Please contact the restaurant directly.',
                   });
                 }
 
@@ -534,13 +547,13 @@ restService.post("/webhook", function (req, res) {
               })
               .catch(err => {
                 return res.json({
-                  fulfillmentText: 'An error took place while recovering data from db ' + 'No establishment found with id ' + eId + ' ' + err
+                  fulfillmentText: 'An error took place while recovering data from db ' + 'No dish found for the establishment id ' + eId + '. Technical stuff: ' + err
                 });
               });
           }
         } else {
           return res.json({
-            fulfillmentText: 'No establishment found with the name of ' + restaurant + ' ' + JSON.stringify(docs)
+            fulfillmentText: 'No establishment found with the name of ' + restaurant + '.'
           });
         }
       })
@@ -966,8 +979,26 @@ restService.post("/webhook", function (req, res) {
                       email: userInformationJSON.email
                     }
                   }, { upsert: true }).exec().then(cardSuccess => {
-                    return res.json({
-                      fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction.'
+                    //Email sending
+                    mailOptions.to = userInformationJSON.email;
+                    mailOptions.subject = 'The order was correctly made';
+                    mailOptions.text = 'This is the information of the order you just made:\n' + 
+                    'Restaurant: ' + restaurant + '\n' + 
+                    'Date of the order: ' + date + '\n' + 
+                    'Time of the order: ' + time + '\n' + 
+                    'Order cost: ' + totalCost + '\n' + 
+                    'Order to: ' + userInformationJSON.name + '\n' + 
+                    '\nHope you enjoyed the experience using Carry';
+                    transporter.sendMail(mailOptions, function(error, info){
+                      if (emailError) {
+                        return res.json({
+                          fulfillmentText: 'An error has taken place sending the email but the order has correctly been placed, you will still receive it at ' + time + ' on ' + date +'.'
+                        });
+                      } else {
+                        return res.json({
+                          fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction.'
+                        });
+                      }
                     });
                   }).catch(cardError => {
                     return res.json({
