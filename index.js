@@ -984,7 +984,7 @@ restService.post("/webhook", function (req, res) {
                   }, { upsert: true }).exec().then(cardSuccess => {
                     //Email sending
                     mailOptions.to = userInformationJSON.email;
-                    mailOptions.subject = 'The order was correctly made';
+                    mailOptions.subject = 'The order is on the way! 😋';
                     mailOptions.text = 'This is the information of the order you just made:\n' + 
                     'Restaurant: ' + restaurant + '\n' + 
                     'Date of the order: ' + date + '\n' + 
