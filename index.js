@@ -50,7 +50,9 @@ restService.post("/webhook", function (req, res) {
   let userInformationJSON = jwt.decode(idToken);
 
   var transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, 
     auth: {
         user: Creds.EMAIL_ORIGIN,
         pass: Creds.PASS
