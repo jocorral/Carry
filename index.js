@@ -638,13 +638,11 @@ restService.post("/webhook", function (req, res) {
       //Check if the selected items are between the available options
       //For that, iterate all the items in itemList
       let selectedItem = null;
-      let itemNames = '';
       itemList.forEach(item => {
         //If a wordlist includes all the idWords of this specific item, return the item, if not, return null
         if (item.idwords.every(word => wordList.includes(word))) {
           selectedItem = item;
         }
-        itemNames += '\n' + item.name + ' idWords ' + item.idwords;
       });
 
       let response;
@@ -652,13 +650,12 @@ restService.post("/webhook", function (req, res) {
       //If an item was not selected
       if (selectedItem === null) {
         //Launch error but allow the selection to still be made
-        response = 'There are no items for the words ' + JSON.stringify(wordList) + ' available items ' + JSON.stringify(itemNames) +
-          '\n currently, ';
+        response = 'An error took place trying to get the indicated item, said words ' + JSON.stringify(wordList) + ' available items ' + JSON.stringify(itemList) +
+          '\n currently the selected items are the following: ';
 
         if (selectedItemList.length === 0) {
-          response += 'no item has been selected yet.';
+          response += 'No item has been selected yet.';
         } else {
-          response += 'the selected items are the following: '
           for (let j = 0; j < selectedItemList.length; j++) {
             response = response + selectedItemList[j].amount + ' - ' + selectedItemList[j].name;
           }
