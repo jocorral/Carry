@@ -10,7 +10,9 @@ const Creds = require('./constants');
 const KEY = "Carry";
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
     auth: {
       user: Creds.EMAIL_ORIGIN,
       pass: Creds.PASS
