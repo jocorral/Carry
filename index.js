@@ -16,7 +16,7 @@ const CreditCard = require('./DB/CreditCard');
 
 const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test?retryWrites=true&w=majority";
 const KEY = "Carry";
-const Creds = require('./constants');
+/*const Creds = require('./constants');
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -30,7 +30,7 @@ const mailOptions = {
   to: '',
   subject: '',
   text: ''
-};
+};*/
 
 const restService = express();
 
@@ -980,7 +980,7 @@ restService.post("/webhook", function (req, res) {
                     }
                   }, { upsert: true }).exec().then(cardSuccess => {
                     //Email sending
-                    mailOptions.to = userInformationJSON.email;
+                    /*mailOptions.to = userInformationJSON.email;
                     mailOptions.subject = 'The order was correctly made';
                     mailOptions.text = 'This is the information of the order you just made:\n' + 
                     'Restaurant: ' + restaurant + '\n' + 
@@ -994,12 +994,12 @@ restService.post("/webhook", function (req, res) {
                         return res.json({
                           fulfillmentText: 'An error has taken place sending the email but the order has correctly been placed, you will still receive it at ' + time + ' on ' + date +'.'
                         });
-                      } else {
+                      } else {*/
                         return res.json({
                           fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction.'
                         });
-                      }
-                    });
+                    /*  }
+                    });*/
                   }).catch(cardError => {
                     return res.json({
                       fulfillmentText: 'Error took place saving the card information: ' + JSON.stringify(cardError)
