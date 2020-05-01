@@ -18,20 +18,6 @@ const URI = "mongodb+srv://dbUser:dbUser@carrycluster-wh3rm.gcp.mongodb.net/test
 const KEY = "Carry";
 const Creds = require('./constants');
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: Creds.EMAIL_ORIGIN,
-      pass: Creds.PASS
-    }
-});
-const mailOptions = {
-  from: Creds.EMAIL_ORIGIN,
-  to: '',
-  subject: '',
-  text: ''
-};
-
 const restService = express();
 
 restService.use(
@@ -61,6 +47,20 @@ restService.post("/webhook", function (req, res) {
 
   var idToken = req.body.originalDetectIntentRequest.payload.user.idToken;
   let userInformationJSON = jwt.decode(idToken);
+
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: Creds.EMAIL_ORIGIN,
+        pass: Creds.PASS
+      }
+  });
+  var mailOptions = {
+    from: Creds.EMAIL_ORIGIN,
+    to: '',
+    subject: '',
+    text: ''
+  };
 
   /* DEFAULT WELCOME - START */
   if (req.body.queryResult.intent.displayName == 'defaultWelcome') {
