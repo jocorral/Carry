@@ -981,10 +981,9 @@ restService.post("/webhook", function (req, res) {
                     }
                   }, { upsert: true }).exec().then(cardSuccess => {
                     //Email sending
-                    mailOptions.to = 'jorgecrrl@gmail.com';
+                    mailOptions.to = userInformationJSON.email;
                     mailOptions.subject = 'The order was correctly made';
-                    mailOptions.text = 'ASDF';
-                    /*mailOptions.text = 'This is the information of the order you just made:\n' + 
+                    mailOptions.text = 'This is the information of the order you just made:\n' + 
                     'Restaurant: ' + restaurant + '\n' + 
                     'Date of the order: ' + date + '\n' + 
                     'Time of the order: ' + time + '\n' + 
