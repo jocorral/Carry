@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const converter = require('number-to-words');
 const mongoose = require('mongoose');
 const CryptoJS = require("crypto-js");
+var nodemailer = require('nodemailer');
 
 const Dish = require('./DB/Dish');
 const Order = require('./DB/Order');
