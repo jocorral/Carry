@@ -62,7 +62,8 @@ restService.post("/webhook", function (req, res) {
     from: Creds.EMAIL_ORIGIN,
     to: '',
     subject: '',
-    text: ''
+    text: '',
+    html: ''
   };
 
   /* DEFAULT WELCOME - START */
@@ -956,12 +957,14 @@ restService.post("/webhook", function (req, res) {
         .then(dbOrder => {
           if (dbOrder._id) {
             let orderLines = [];
+            let orderItemsForEmail = [];
             for (let i = 0; i < selectedItemList.length; i++) {
               const orderLine = new OrderLine({
                 amount: selectedItemList[i].amount,
                 orderId: dbOrder._id,
                 dishId: selectedItemList[i].id
               });
+              orderItemsForEmail.push('x' + selectedItemList[i].amount + ' - ' + selectedItemList[i].name);
               orderLines.push(orderLine);
             }
             const orderLineItems = new OrderLineList({
@@ -989,9 +992,11 @@ restService.post("/webhook", function (req, res) {
                     'Restaurant: ' + restaurant + '\n' + 
                     'Date of the order: ' + date + '\n' + 
                     'Time of the order: ' + time + '\n' + 
+                    'Order items: ' + '\n-' + orderItemsForEmail.join(',\n-');
                     'Order cost: ' + totalCost + '€\n' + 
                     'Order to: ' + userInformationJSON.name + '\n' + 
                     '\nHope you enjoyed the experience using Carry!';
+                    mailOptions.html= 'Message from: Carry company <br></br> Email: ' +  userInformationJSON.email;
                     transporter.sendMail(mailOptions, function(emailError, info){
                       if (emailError) {
                         return res.json({
