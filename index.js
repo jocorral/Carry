@@ -991,7 +991,7 @@ restService.post("/webhook", function (req, res) {
                     'Restaurant: ' + restaurant + '<br></br>' + 
                     'Date of the order: ' + date + '<br></br>' + 
                     'Time of the order: ' + time + '<br></br>' + 
-                    'Order items: ' + '<br></br>-' + orderItemsForEmail.join(',<br></br>-');
+                    'Order items: ' + '<br></br>* ' + orderItemsForEmail.join(',<br></br>* ') +
                     'Order cost: ' + totalCost + '€<br></br>' + 
                     'Order to: ' + userInformationJSON.name + '<br></br>' + 
                     '<br></br>Hope you enjoyed the experience using Carry!';
