@@ -62,7 +62,6 @@ restService.post("/webhook", function (req, res) {
     from: Creds.EMAIL_ORIGIN,
     to: '',
     subject: '',
-    text: '',
     html: ''
   };
 
@@ -988,7 +987,7 @@ restService.post("/webhook", function (req, res) {
                     //Email sending
                     mailOptions.to = userInformationJSON.email;
                     mailOptions.subject = 'The order is on the way! 😋';
-                    mailOptions.text = 'This is the information of the order you just made:\n' + 
+                    let messageTxt = 'This is the information of the order you just made:\n' + 
                     'Restaurant: ' + restaurant + '\n' + 
                     'Date of the order: ' + date + '\n' + 
                     'Time of the order: ' + time + '\n' + 
@@ -996,7 +995,7 @@ restService.post("/webhook", function (req, res) {
                     'Order cost: ' + totalCost + '€\n' + 
                     'Order to: ' + userInformationJSON.name + '\n' + 
                     '\nHope you enjoyed the experience using Carry!';
-                    mailOptions.html= 'Message from: Carry company <br></br> Email: ' +  userInformationJSON.email;
+                    mailOptions.html= 'Message from: Carry company <br></br>Email: ' +  userInformationJSON.email + '<br></br>' + messageTxt;
                     transporter.sendMail(mailOptions, function(emailError, info){
                       if (emailError) {
                         return res.json({
