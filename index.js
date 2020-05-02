@@ -987,13 +987,13 @@ restService.post("/webhook", function (req, res) {
                     //Email sending
                     mailOptions.to = userInformationJSON.email;
                     mailOptions.subject = 'The order is on the way! 😋';
-                    let messageTxt = 'This is the information of the order you just made:<br></br>' + 
+                    let messageTxt = '<br></br>This is the information of the order you just made:<br></br>' + 
                     'Restaurant: ' + restaurant + '<br></br>' + 
                     'Date of the order: ' + date + '<br></br>' + 
                     'Time of the order: ' + time + '<br></br>' + 
-                    'Order items: ' + '<br></br>* ' + orderItemsForEmail.join(',<br></br>* ') +
+                    'Order items: ' + '<br></br>* ' + orderItemsForEmail.join(',<br></br>* ')  + '<br></br>'+
                     'Order cost: ' + totalCost + '€<br></br>' + 
-                    'Order to: ' + userInformationJSON.name + '<br></br>' + 
+                    'Order for: ' + userInformationJSON.name + '<br></br>' + 
                     '<br></br>Hope you enjoyed the experience using Carry!';
                     mailOptions.html= 'Message from: Carry company <br></br>Email: ' +  userInformationJSON.email + '<br></br>' + messageTxt;
                     transporter.sendMail(mailOptions, function(emailError, info){
