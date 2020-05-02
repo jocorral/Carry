@@ -100,21 +100,24 @@ restService.post("/webhook", function (req, res) {
                 for (let i = 0; i < listOfDeliveredOrders.length; i++) {
                   listString = listString + '\n' + (i + 1) + ' - ' + listOfDeliveredOrders[i].name;
                 }
-              }
-
-              // Return response to user
-              return res.json({
-                fulfillmentText: 'The list of delivered orders is the following: ' + listString + '. Which one of them do you want to evaluate?',
-                outputContexts: [
-                  {
-                    name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_evaluation",
-                    lifespanCount: 5,
-                    parameters: {
-                      "deliveredorders": listOfDeliveredOrders
+                // Return response to user
+                return res.json({
+                  fulfillmentText: 'The list of delivered orders is the following: ' + listString + '. Which one of them do you want to evaluate?',
+                  outputContexts: [
+                    {
+                      name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/await_evaluation",
+                      lifespanCount: 5,
+                      parameters: {
+                        "deliveredorders": listOfDeliveredOrders
+                      }
                     }
-                  }
-                ]
-              });
+                  ]
+                });
+              }else{
+                return res.json({
+                  fulfillmentText: 'There are no delivered orders yet, please place an order first.'
+                });
+              }
             })
             .catch(err => {
               return res.json({
@@ -556,7 +559,7 @@ restService.post("/webhook", function (req, res) {
           }
         } else {
           return res.json({
-            fulfillmentText: 'No establishment found with the name of ' + restaurant + '.'
+            fulfillmentText: 'No establishment found with the name of ' + restaurant + ', but no error taken place in database. Please indicate an existing establishment name.'
           });
         }
       })
