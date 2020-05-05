@@ -146,6 +146,10 @@ restService.post("/webhook", function (req, res) {
                 for (let i = 0; i < listOfActiveOrders.length; i++) {
                   listString = listString + '\n' + (i + 1) + ' - ' + listOfActiveOrders[i].name;
                 }
+              }else{
+                return res.json({
+                  fulfillmentText: 'There are no active orders yet, please place an order first.'
+                });
               }
 
               return res.json({
@@ -990,7 +994,7 @@ restService.post("/webhook", function (req, res) {
                     //Email sending
                     mailOptions.to = userInformationJSON.email;
                     mailOptions.subject = 'The order is on the way! 😋';
-                    let messageTxt = '<br></br>This is the information of the order you just made:<br></br>' + 
+                    let messageTxt = 'Message<br></br><br></br>This is the information of the order you just made:<br></br>' + 
                     'Restaurant: ' + restaurant + '<br></br>' + 
                     'Date of the order: ' + date + '<br></br>' + 
                     'Time of the order: ' + time + '<br></br>' + 
@@ -1006,7 +1010,7 @@ restService.post("/webhook", function (req, res) {
                         });
                       } else {
                         return res.json({
-                          fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of your transaction.'
+                          fulfillmentText: 'Nice! You have just paid your order, you will shortly receive an email with the information of this transaction.'
                         });
                       }
                     });
