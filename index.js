@@ -415,7 +415,7 @@ restService.post("/webhook", function (req, res) {
       }
       else {
         return res.json({
-          fulfillmentText: 'You want to set a value of ' + insertedValue + ' in the order in the order number ' + selectedPosition + ', is that right?',
+          fulfillmentText: 'You want to set a value of ' + insertedValue + ' in the order number ' + selectedPosition + ', is that right?',
           outputContexts: [{
             name: "projects/" + PROJECT_ID + "/agent/sessions/" + SESSION_ID + "/contexts/setEvaluationValue-followup",
             lifespanCount: 2,
@@ -469,7 +469,7 @@ restService.post("/webhook", function (req, res) {
         function (errorOrderEvaluation, orderUpdated) {
           if (orderUpdated) {
             return res.json({
-              fulfillmentText: 'The order ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. '
+              fulfillmentText: 'The ' + deliveredOrderList[arrayPosition].name + ' has been evaluated with a ' + JSON.stringify(insertedValue) + '. '
             });
           } else {
             return res.json({
