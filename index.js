@@ -642,6 +642,9 @@ restService.post("/webhook", function (req, res) {
         else if (wordList[i].toLowerCase() === 'peperoni') {
           wordList[i] = 'peperoni';
         }
+        else if (wordList[i].toLowerCase() === 'pepperoni') {
+          wordList[i] = 'pepperoni';
+        }
         else if (wordList[i].toLowerCase() === 'barbacoa') {
           wordList[i] = 'bbq';
         }
