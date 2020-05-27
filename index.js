@@ -312,7 +312,7 @@ restService.post("/webhook", function (req, res) {
         function (errorOrderCancelation, orderUpdated) {
           if (orderUpdated) {
             return res.json({
-              fulfillmentText: 'The order ' + activeOrderList[arrayPosition].name + ' has been canceled.'
+              fulfillmentText: 'The ' + activeOrderList[arrayPosition].name + ' has been canceled.'
             });
           }
           else {
